@@ -1,67 +1,6 @@
 {
-  "atualizado_em": "2026-06-12",
-  "perfis": [
-    {
-      "username": "proflucascruz",
-      "url": "https://www.instagram.com/proflucascruz/",
-      "foco": "direito previdenciário educacional",
-      "ativo": true
-    },
-    {
-      "username": "yagocaladoadv",
-      "url": "https://www.instagram.com/yagocaladoadv/",
-      "foco": "direito previdenciário",
-      "ativo": true
-    },
-    {
-      "username": "lucascruzadvocacia",
-      "url": "https://www.instagram.com/lucascruzadvocacia/",
-      "foco": "advocacia previdenciária",
-      "ativo": true
-    },
-    {
-      "username": "ralfnobrega",
-      "url": "https://www.instagram.com/ralfnobrega/",
-      "foco": "direito previdenciário",
-      "ativo": true
-    },
-    {
-      "username": "victorcarvalhoprof",
-      "url": "https://www.instagram.com/victorcarvalhoprof/",
-      "foco": "educação jurídica previdenciária",
-      "ativo": true
-    },
-    {
-      "username": "fabioturazzaadvogado",
-      "url": "https://www.instagram.com/fabioturazzaadvogado/",
-      "foco": "advocacia previdenciária",
-      "ativo": true
-    },
-    {
-      "username": "advogadajuliabatista",
-      "url": "https://www.instagram.com/advogadajuliabatista/",
-      "foco": "direito previdenciário",
-      "ativo": true
-    },
-    {
-      "username": "escobaradvogados",
-      "url": "https://www.instagram.com/escobaradvogados/",
-      "foco": "advocacia previdenciária",
-      "ativo": true
-    },
-    {
-      "username": "adv.prevbr",
-      "url": "https://www.instagram.com/adv.prevbr/",
-      "foco": "direito previdenciário",
-      "ativo": true
-    },
-    {
-      "username": "advlaleskarocha",
-      "url": "https://www.instagram.com/advlaleskarocha/",
-      "foco": "direito previdenciário",
-      "ativo": true
-    }
-  ],
+  "_instrucoes": "Este arquivo é um template vazio. Os perfis monitorados são configurados como secret no GitHub (Settings → Secrets → CONCORRENTES_LIST) e nunca ficam visíveis neste repositório público.",
+  "_formato_secret": "perfil1,perfil2,perfil3  (separados por vírgula, sem @ e sem espaços)",
   "nosso_perfil": {
     "username": "baldezlabs",
     "url": "https://www.instagram.com/baldezlabs/"
