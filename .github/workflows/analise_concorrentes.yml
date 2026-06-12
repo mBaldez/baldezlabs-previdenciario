@@ -4,7 +4,13 @@ on:
   schedule:
     # Todo domingo às 08:00 (horário de Brasília = 11:00 UTC)
     - cron: '0 11 * * 0'
-  workflow_dispatch:  # Permite rodar manualmente a qualquer momento
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   analisar:
@@ -13,6 +19,8 @@ jobs:
     steps:
       - name: Checkout do repositório
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Configurar Python
         uses: actions/setup-python@v5
@@ -24,9 +32,6 @@ jobs:
 
       - name: Executar análise de mercado
         env:
-          # Secret configurado em: Settings → Secrets and variables → Actions
-          # Formato: perfil1,perfil2,perfil3  (sem espaços, sem @)
-          # Os nomes nunca ficam visíveis no código público
           CONCORRENTES_LIST: ${{ secrets.CONCORRENTES_LIST }}
         run: python scripts/analise_concorrencia.py
 
