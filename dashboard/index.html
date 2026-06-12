@@ -1,0 +1,1440 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agenda de Conteúdo · @baldezlabs · Direito Previdenciário</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy:         #0B1F3A;
+      --navy-mid:     #122846;
+      --navy-light:   #1A3455;
+      --navy-subtle:  #1e3d63;
+      --gold:         #C9A84C;
+      --gold-dim:     #a88632;
+      --gold-pale:    rgba(201,168,76,0.12);
+      --gold-border:  rgba(201,168,76,0.3);
+      --white:        #FFFFFF;
+      --text-primary: #F2EDE4;
+      --text-second:  #A8A09A;
+      --text-dim:     #6B6560;
+      --border:       rgba(255,255,255,0.07);
+      --border-gold:  rgba(201,168,76,0.25);
+      --radius-sm: 6px; --radius-md: 10px; --radius-lg: 14px;
+      /* Category colours */
+      --ca-bg:rgba(24,95,165,.25);   --ca-fg:#7BB8F5;
+      --cb-bg:rgba(15,110,86,.25);   --cb-fg:#6ED5B5;
+      --cc-bg:rgba(140,90,20,.25);   --cc-fg:#F0B860;
+      --cd-bg:rgba(130,40,70,.25);   --cd-fg:#F0A0C0;
+      --ce-bg:rgba(80,60,160,.25);   --ce-fg:#B8AAFF;
+      --cf-bg:rgba(160,40,40,.25);   --cf-fg:#F5A0A0;
+      --cg-bg:rgba(20,140,120,.25);  --cg-fg:#7DE8D8;
+    }
+    html { font-size:15px; }
+    body { font-family:'Lato',sans-serif; background:var(--navy); color:var(--text-primary); min-height:100vh; -webkit-font-smoothing:antialiased; }
+
+    /* ── HEADER ── */
+    .header { background:linear-gradient(180deg,#081629 0%,var(--navy) 100%); border-bottom:1px solid var(--border-gold); padding:1.25rem 2rem; display:flex; align-items:center; justify-content:space-between; gap:1rem; }
+    .header-left { display:flex; align-items:center; gap:1rem; }
+    .logo-mark { width:42px;height:42px; border:1.5px solid var(--gold); display:flex;align-items:center;justify-content:center; flex-shrink:0; }
+    .logo-mark span { font-family:'Cormorant Garamond',serif; font-size:18px; font-weight:600; color:var(--gold); letter-spacing:1px; }
+    .header-title { font-family:'Cormorant Garamond',serif; font-size:1.35rem; font-weight:600; color:var(--white); letter-spacing:.02em; }
+    .header-sub { font-size:.72rem; color:var(--gold); letter-spacing:.1em; text-transform:uppercase; font-weight:400; margin-top:2px; }
+    .ig-badge { display:flex;align-items:center;gap:6px; background:var(--gold-pale); border:1px solid var(--border-gold); padding:5px 12px; border-radius:100px; font-size:.75rem; color:var(--gold); letter-spacing:.04em; }
+    .ig-dot { width:6px;height:6px;border-radius:50%;background:var(--gold);animation:pulse 2s ease-in-out infinite; }
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+    /* ── TABS ── */
+    .tabs-bar { background:#081629; border-bottom:1px solid var(--border-gold); padding:0 2rem; display:flex; gap:2px; overflow-x:auto; }
+    .tabs-bar::-webkit-scrollbar{height:0}
+    .tab { padding:14px 18px; font-size:.78rem; letter-spacing:.06em; text-transform:uppercase; font-weight:700; font-family:'Lato',sans-serif; border:none; background:none; cursor:pointer; color:var(--text-dim); border-bottom:2px solid transparent; white-space:nowrap; transition:color .2s,border-color .2s; display:flex;align-items:center;gap:7px; }
+    .tab.active { color:var(--gold); border-bottom-color:var(--gold); }
+    .tab:hover:not(.active) { color:var(--text-second); }
+
+    /* ── LAYOUT ── */
+    .content { padding:2rem; max-width:1100px; margin:0 auto; }
+    .view { display:none; }
+    .view.active { display:block; }
+
+    .section-head { display:flex;align-items:flex-end;justify-content:space-between; margin-bottom:1.5rem; padding-bottom:1rem; border-bottom:1px solid var(--border); }
+    .section-title { font-family:'Cormorant Garamond',serif; font-size:1.6rem; font-weight:500; color:var(--white); line-height:1; }
+    .section-sub { font-size:.75rem; color:var(--text-second); margin-top:4px; }
+
+    /* ── CALENDAR ── */
+    .cal-nav { display:flex;align-items:center;justify-content:space-between; margin-bottom:1.25rem; background:var(--navy-mid); border:1px solid var(--border-gold); border-radius:var(--radius-md); padding:10px 16px; }
+    .cal-month-label { font-family:'Cormorant Garamond',serif; font-size:1.3rem; font-weight:600; color:var(--white); min-width:200px; text-align:center; }
+    .cal-btn { width:32px;height:32px; border:1px solid var(--border-gold); background:var(--gold-pale); color:var(--gold); border-radius:var(--radius-sm); cursor:pointer; display:flex;align-items:center;justify-content:center; font-size:16px; transition:background .15s; }
+    .cal-btn:hover { background:rgba(201,168,76,.22); }
+    .cal-today-btn { font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;font-weight:700; padding:6px 14px; border:1px solid var(--border-gold); background:var(--gold-pale); color:var(--gold); border-radius:var(--radius-sm); cursor:pointer; transition:background .15s; font-family:'Lato',sans-serif; }
+    .cal-today-btn:hover { background:rgba(201,168,76,.22); }
+    .cal-year-sel { background:transparent;border:none;color:var(--text-second);font-size:.8rem;font-family:'Lato',sans-serif;cursor:pointer;padding:2px 4px; }
+    .cal-year-sel:focus{outline:none}
+    .cal-year-sel option{background:var(--navy);color:var(--text-primary)}
+
+    .cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; }
+    .cal-day-label { text-align:center; font-size:.68rem; color:var(--gold); font-weight:700; letter-spacing:.08em; text-transform:uppercase; padding:8px 0; }
+    .cal-day { min-height:80px; background:var(--navy-mid); border:1px solid var(--border); border-radius:var(--radius-sm); padding:5px 7px; cursor:pointer; transition:border-color .15s,background .15s; }
+    .cal-day:hover { border-color:var(--border-gold); background:var(--navy-light); }
+    .cal-day.empty { background:rgba(8,22,41,.4); border-color:transparent; cursor:default; pointer-events:none; }
+    .cal-day.today { border-color:var(--gold); background:var(--gold-pale); }
+    .cal-day.today .cal-day-num { color:var(--gold); font-weight:700; }
+    .cal-day-num { font-size:.7rem; color:var(--text-second); margin-bottom:4px; display:flex; align-items:center; justify-content:space-between; }
+    .cal-post-count { font-size:.6rem; background:var(--gold-pale); color:var(--gold); border-radius:100px; padding:0 5px; font-weight:700; }
+    .cal-post-tag { font-size:.6rem; padding:2px 5px; border-radius:3px; margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:flex; align-items:center; gap:4px; line-height:1.5; }
+    .cal-post-tag.done-post { opacity:.45; text-decoration:line-through; }
+    .post-time-dot { font-size:.58rem; color:inherit; opacity:.7; flex-shrink:0; }
+    .cat-a{background:var(--ca-bg);color:var(--ca-fg)} .cat-b{background:var(--cb-bg);color:var(--cb-fg)}
+    .cat-c{background:var(--cc-bg);color:var(--cc-fg)} .cat-d{background:var(--cd-bg);color:var(--cd-fg)}
+    .cat-e{background:var(--ce-bg);color:var(--ce-fg)} .cat-f{background:var(--cf-bg);color:var(--cf-fg)}
+    .cat-g{background:var(--cg-bg);color:var(--cg-fg)}
+
+    .cal-legend { display:flex;flex-wrap:wrap;gap:8px; margin-top:1rem; padding:10px 14px; background:var(--navy-mid); border:1px solid var(--border); border-radius:var(--radius-md); }
+    .cal-legend-item { display:flex;align-items:center;gap:5px; font-size:.72rem;color:var(--text-second); }
+    .legend-dot { width:8px;height:8px;border-radius:2px;flex-shrink:0; }
+
+    /* ── DAY DETAIL MODAL ── */
+    .modal-bg { display:none;position:fixed;inset:0;background:rgba(8,22,41,.8);backdrop-filter:blur(4px);z-index:200;align-items:center;justify-content:center; }
+    .modal-bg.open { display:flex; }
+    .modal { background:var(--navy-mid);border:1px solid var(--border-gold);border-radius:var(--radius-lg);padding:2rem;width:420px;max-width:95vw;box-shadow:0 24px 60px rgba(0,0,0,.5);max-height:90vh;overflow-y:auto; }
+    .modal-title { font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:600;color:var(--white);margin-bottom:1.25rem;padding-bottom:.75rem;border-bottom:1px solid var(--border-gold); display:flex;align-items:center;justify-content:space-between; }
+    .modal-close { width:28px;height:28px;border:1px solid var(--border);background:none;color:var(--text-second);border-radius:var(--radius-sm);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:border-color .15s; }
+    .modal-close:hover { border-color:var(--border-gold);color:var(--text-primary); }
+    .modal label { font-size:.7rem;color:var(--gold);display:block;margin-bottom:5px;letter-spacing:.08em;text-transform:uppercase;font-weight:700; }
+    .modal-tema-box { font-size:.82rem;color:var(--text-primary);background:rgba(0,0,0,.2);padding:10px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);margin-bottom:1rem;line-height:1.5; }
+    .modal-row { display:grid;grid-template-columns:1fr 1fr;gap:12px; }
+    .modal input[type="date"],.modal input[type="time"],.modal select { width:100%;margin-bottom:1rem;background:rgba(0,0,0,.2);border:1px solid var(--border-gold);border-radius:var(--radius-sm);color:var(--text-primary);padding:8px 12px;font-family:'Lato',sans-serif;font-size:.85rem; }
+    .modal input:focus,.modal select:focus{outline:none;border-color:var(--gold)}
+    .modal select option{background:var(--navy)}
+    .modal-actions { display:flex;gap:8px;justify-content:flex-end;margin-top:.5rem; }
+    .btn-primary { padding:8px 20px;background:var(--gold);color:var(--navy);border:none;border-radius:var(--radius-sm);cursor:pointer;font-size:.8rem;font-family:'Lato',sans-serif;font-weight:700;letter-spacing:.04em;transition:background .15s; }
+    .btn-primary:hover { background:#d4b05a; }
+    .btn-secondary { padding:8px 16px;background:none;border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;font-size:.8rem;font-family:'Lato',sans-serif;color:var(--text-second);transition:border-color .15s; }
+    .btn-secondary:hover { border-color:var(--border-gold);color:var(--text-primary); }
+
+    /* ── POST LIST IN DAY DETAIL ── */
+    .day-post-list { display:flex;flex-direction:column;gap:8px;margin-bottom:1.25rem; }
+    .day-post-item { background:rgba(0,0,0,.2);border:1px solid var(--border);border-radius:var(--radius-md);padding:10px 12px;display:flex;align-items:flex-start;gap:10px; transition:border-color .15s; }
+    .day-post-item:hover { border-color:var(--border-gold); }
+    .day-post-item.is-done { opacity:.5; }
+    .day-post-item.is-overdue { border-left:3px solid #EF9F27; }
+    .day-post-item.is-done { border-left:3px solid #639922; }
+    .dpi-main { flex:1;min-width:0; }
+    .dpi-meta { display:flex;align-items:center;gap:6px;margin-bottom:5px;flex-wrap:wrap; }
+    .dpi-time { font-size:.68rem;font-weight:700;color:var(--gold);background:var(--gold-pale);border:1px solid var(--border-gold);padding:2px 7px;border-radius:100px; }
+    .dpi-area { font-size:.62rem;font-weight:700;padding:2px 7px;border-radius:100px;background:rgba(255,255,255,.05);color:var(--text-second); }
+    .dpi-cat { font-size:.62rem;font-weight:700;padding:2px 6px;border-radius:100px; }
+    .dpi-type { font-size:.62rem;padding:2px 7px;border-radius:100px;background:rgba(80,60,160,.2);color:#B8AAFF; }
+    .dpi-q { font-size:.82rem;color:var(--text-primary);line-height:1.45; }
+    .dpi-actions { display:flex;flex-direction:column;gap:6px;flex-shrink:0;align-items:flex-end; }
+    .btn-done { font-size:.65rem;font-weight:700;letter-spacing:.04em;padding:4px 9px;border-radius:var(--radius-sm);cursor:pointer;transition:all .15s;font-family:'Lato',sans-serif;border:1px solid; white-space:nowrap; }
+    .btn-done.pending { border-color:var(--border-gold);background:var(--gold-pale);color:var(--gold); }
+    .btn-done.pending:hover { background:rgba(201,168,76,.22); }
+    .btn-done.done-btn { border-color:#639922;background:rgba(99,153,34,.15);color:#90e040; }
+    .btn-delete { font-size:.65rem;font-weight:700;letter-spacing:.04em;padding:4px 9px;border-radius:var(--radius-sm);cursor:pointer;transition:all .15s;font-family:'Lato',sans-serif;border:1px solid var(--border);background:none;color:var(--text-dim); white-space:nowrap; }
+    .btn-delete:hover { border-color:#E24B4A;color:#E24B4A;background:rgba(226,75,74,.1); }
+    .day-empty-msg { font-size:.82rem;color:var(--text-dim);text-align:center;padding:1.5rem 0;font-style:italic; }
+    .btn-add-to-day { width:100%;padding:9px;border:1px dashed var(--border-gold);background:transparent;color:var(--gold);border-radius:var(--radius-md);cursor:pointer;font-size:.78rem;font-family:'Lato',sans-serif;font-weight:700;letter-spacing:.04em;transition:background .15s; }
+    .btn-add-to-day:hover { background:var(--gold-pale); }
+
+    /* ── BANCO DE TEMAS ── */
+    .filter-group { margin-bottom:1rem; }
+    .filter-group-label { font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);margin-bottom:6px; }
+    .filters { display:flex;gap:6px;flex-wrap:wrap; }
+    .filter-btn { padding:6px 14px;border:1px solid var(--border-gold);border-radius:100px;background:transparent;cursor:pointer;font-size:.73rem;color:var(--text-second);font-family:'Lato',sans-serif;font-weight:700;letter-spacing:.04em;transition:all .15s; }
+    .filter-btn:hover { color:var(--text-primary);border-color:rgba(201,168,76,.6); }
+    .filter-btn.active { background:var(--gold);color:var(--navy);border-color:var(--gold); }
+    .filter-btn.future { opacity:.4;cursor:not-allowed;border-style:dashed; }
+    .filter-btn.future:hover { color:var(--text-second);border-color:var(--border-gold); }
+    .filter-divider { height:1px;background:var(--border);margin:12px 0; }
+    .theme-list { display:flex;flex-direction:column;gap:6px; }
+    .theme-card { background:var(--navy-mid);border:1px solid var(--border);border-radius:var(--radius-md);padding:12px 14px;display:flex;align-items:flex-start;gap:12px;transition:border-color .15s; }
+    .theme-card:hover { border-color:var(--border-gold); }
+    .theme-num { font-size:.68rem;color:var(--text-dim);min-width:22px;padding-top:2px;font-family:'Cormorant Garamond',serif; }
+    .theme-body { flex:1; }
+    .theme-q { font-size:.88rem;color:var(--text-primary);font-weight:400;margin-bottom:4px;line-height:1.45; }
+    .theme-tip { font-size:.77rem;color:var(--text-second);line-height:1.55; }
+    .theme-actions { display:flex;flex-direction:column;gap:6px;align-items:flex-end;flex-shrink:0; }
+    .theme-badge { font-size:.63rem;padding:3px 8px;border-radius:100px;white-space:nowrap;font-weight:700;letter-spacing:.04em; }
+    .area-badge { font-size:.6rem;padding:2px 7px;border-radius:100px;background:rgba(255,255,255,.06);color:var(--text-dim);border:1px solid var(--border);white-space:nowrap;font-weight:700; }
+    .btn-agendar { font-size:.72rem;border:1px solid var(--border-gold);background:transparent;padding:4px 10px;border-radius:var(--radius-sm);cursor:pointer;color:var(--gold);white-space:nowrap;font-family:'Lato',sans-serif;font-weight:700;letter-spacing:.04em;transition:all .15s; }
+    .btn-agendar:hover { background:var(--gold-pale); }
+    .btn-agendar.added { border-color:#6ED5B5;color:#6ED5B5;background:rgba(15,110,86,.15); }
+
+    /* ── ROTEIROS ── */
+    .roteiro-card { background:var(--navy-mid);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem 1.5rem;margin-bottom:14px; }
+    .roteiro-header { display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;gap:12px; }
+    .roteiro-title { font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:600;color:var(--white);line-height:1.4;flex:1; }
+    .roteiro-type { font-size:.65rem;padding:4px 10px;border-radius:100px;white-space:nowrap;font-weight:700;letter-spacing:.06em;text-transform:uppercase;flex-shrink:0; }
+    .roteiro-type.reels{background:var(--ce-bg);color:var(--ce-fg)} .roteiro-type.carrossel{background:var(--cb-bg);color:var(--cb-fg)} .roteiro-type.patrocinado{background:var(--cc-bg);color:var(--cc-fg)}
+    .roteiro-section { margin-bottom:10px; }
+    .roteiro-sec-label { font-size:.65rem;color:var(--gold);text-transform:uppercase;letter-spacing:.1em;font-weight:700;margin-bottom:5px; }
+    .roteiro-text { font-size:.82rem;color:var(--text-second);line-height:1.65;background:rgba(0,0,0,.15);border-radius:var(--radius-sm);padding:9px 12px;border-left:2px solid var(--border-gold); }
+
+    /* ── IMPULSIONAR ── */
+    .imp-info-box { background:var(--navy-mid);border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:var(--radius-md);padding:12px 15px;font-size:.82rem;color:var(--text-second);line-height:1.6;margin-bottom:1.5rem; }
+    .imp-area-tabs { display:flex;gap:6px;margin-bottom:1rem;flex-wrap:wrap; }
+    .imp-area-tab { padding:5px 14px;border:1px solid var(--border-gold);border-radius:100px;background:transparent;cursor:pointer;font-size:.72rem;color:var(--text-second);font-family:'Lato',sans-serif;font-weight:700;transition:all .15s; }
+    .imp-area-tab.active { background:var(--gold);color:var(--navy);border-color:var(--gold); }
+    .imp-card { background:var(--navy-mid);border:1px solid var(--border);border-radius:var(--radius-md);padding:12px 14px;margin-bottom:8px;display:flex;gap:12px;align-items:center;transition:border-color .15s; }
+    .imp-card:hover { border-color:var(--border-gold); }
+    .imp-priority { width:8px;height:8px;border-radius:50%;flex-shrink:0; }
+    .imp-priority.alta{background:#E24B4A;box-shadow:0 0 6px rgba(226,75,74,.5)} .imp-priority.media{background:#EF9F27;box-shadow:0 0 6px rgba(239,159,39,.5)} .imp-priority.baixa{background:#639922;box-shadow:0 0 6px rgba(99,153,34,.4)}
+    .imp-info { flex:1; }
+    .imp-title { font-size:.85rem;font-weight:400;color:var(--text-primary); }
+    .imp-reason { font-size:.75rem;color:var(--text-second);margin-top:2px; }
+    .imp-badge { font-size:.65rem;padding:3px 10px;border-radius:100px;background:var(--gold-pale);color:var(--gold);border:1px solid var(--border-gold);white-space:nowrap;font-weight:700;letter-spacing:.04em; }
+    .imp-legend { display:flex;gap:16px;margin-top:1rem;font-size:.72rem;color:var(--text-second); }
+    .imp-legend span { display:flex;align-items:center;gap:6px; }
+    .imp-legend-dot { width:8px;height:8px;border-radius:50%; }
+
+    /* ── INSIGHTS ── */
+    .metrics-grid { display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:2rem; }
+    .metric-card { background:var(--navy-mid);border:1px solid var(--border);border-radius:var(--radius-md);padding:1.1rem;position:relative;overflow:hidden; }
+    .metric-card::before { content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold),transparent); }
+    .metric-label { font-size:.7rem;color:var(--text-second);margin-bottom:6px; }
+    .metric-val { font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:600;color:var(--white);line-height:1; }
+    .insight-section { margin-bottom:2rem; }
+    .insight-title { font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:500;color:var(--white);margin-bottom:1rem;display:flex;align-items:center;gap:8px; }
+    .insight-title::after { content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border-gold),transparent); }
+    .bar-row { display:flex;align-items:center;gap:10px;margin-bottom:8px; }
+    .bar-label { font-size:.75rem;color:var(--text-second);width:100px;flex-shrink:0; }
+    .bar-track { flex:1;height:7px;background:rgba(255,255,255,.05);border-radius:4px;overflow:hidden; }
+    .bar-fill { height:100%;border-radius:4px; }
+    .bar-count { font-size:.72rem;color:var(--text-second);width:22px;text-align:right; }
+    .tip-card { background:var(--navy-mid);border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:var(--radius-md);padding:11px 14px;font-size:.82rem;color:var(--text-primary);margin-bottom:8px;line-height:1.6; }
+    .freq-box { background:var(--navy-mid);border:1px solid var(--border);border-radius:var(--radius-md);padding:14px 16px;font-size:.82rem;color:var(--text-primary);line-height:1.9; }
+    .freq-box strong { color:var(--gold); }
+
+    ::-webkit-scrollbar{width:6px;height:6px}
+    ::-webkit-scrollbar-track{background:var(--navy)}
+    ::-webkit-scrollbar-thumb{background:var(--navy-subtle);border-radius:3px}
+    ::-webkit-scrollbar-thumb:hover{background:var(--gold-dim)}
+
+    @media(max-width:640px){
+      .header{padding:1rem} .content{padding:1rem} .tabs-bar{padding:0 1rem}
+      .tab{padding:12px 12px;font-size:.7rem}
+      .cal-month-label{font-size:1rem;min-width:160px}
+      .metrics-grid{grid-template-columns:repeat(2,1fr)}
+    }
+
+    /* ── TEMAS EM ALTA (dinâmico) ── */
+    .trend-header-bar{background:var(--navy-mid);border:1px solid var(--border-gold);border-radius:var(--radius-md);padding:10px 16px;margin-bottom:1.25rem;display:flex;align-items:center;justify-content:space-between;font-size:.75rem;color:var(--text-second);flex-wrap:wrap;gap:6px;}
+    .trend-update-date{color:var(--gold);font-weight:700;}
+    .trend-cards{display:flex;flex-direction:column;gap:10px;}
+    .trend-card{background:var(--navy-mid);border:1px solid var(--border);border-radius:var(--radius-md);padding:14px 16px;transition:border-color .15s;}
+    .trend-card:hover{border-color:var(--border-gold);}
+    .trend-card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;}
+    .trend-area-tag{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:2px 9px;border-radius:100px;background:rgba(201,168,76,.15);color:var(--gold);border:1px solid var(--border-gold);}
+    .trend-score{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:600;color:var(--gold);line-height:1;}
+    .trend-score-bar{height:3px;background:rgba(255,255,255,.07);border-radius:99px;margin-bottom:10px;overflow:hidden;}
+    .trend-score-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--gold-dim),var(--gold));}
+    .trend-tema{font-size:.9rem;color:var(--text-primary);font-weight:500;margin-bottom:5px;line-height:1.45;}
+    .trend-motivo{font-size:.78rem;color:var(--text-second);line-height:1.55;margin-bottom:10px;}
+    .trend-hashtags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;}
+    .trend-hashtag{font-size:.7rem;color:var(--gold);background:var(--gold-pale);border:1px solid var(--gold-border);padding:2px 8px;border-radius:100px;}
+    .trend-btn-copy{font-size:.7rem;font-weight:700;letter-spacing:.04em;padding:5px 12px;border:1px solid var(--border-gold);background:transparent;color:var(--gold);border-radius:var(--radius-sm);cursor:pointer;font-family:'Lato',sans-serif;transition:background .15s;}
+    .trend-btn-copy:hover{background:var(--gold-pale);}
+    .trend-btn-copy.copied{border-color:#6ED5B5;color:#6ED5B5;background:rgba(15,110,86,.15);}
+    .trend-empty{font-size:.85rem;color:var(--text-dim);text-align:center;padding:2rem;font-style:italic;}
+    .trend-loading{display:flex;align-items:center;justify-content:center;gap:10px;padding:3rem;color:var(--text-dim);font-size:.85rem;}
+    .trend-spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,.1);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-left">
+    <div class="logo-mark"><span>MB</span></div>
+    <div>
+      <div class="header-title">Agenda de Conteúdo</div>
+      <div class="header-sub">Baldez Advogados · Direito Previdenciário</div>
+    </div>
+  </div>
+  <div class="ig-badge"><div class="ig-dot"></div>@baldezlabs</div>
+</header>
+
+<!-- TABS -->
+<div class="tabs-bar">
+  <button class="tab active" onclick="switchTab('calendario')">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    Calendário
+  </button>
+  <button class="tab" onclick="switchTab('banco')">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+    Banco de Temas
+  </button>
+  <button class="tab" onclick="switchTab('roteiros')">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+    Roteiros
+  </button>
+  <button class="tab" onclick="switchTab('impulsionar')">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/></svg>
+    Impulsionar
+  </button>
+  <button class="tab" onclick="switchTab('insights')">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    Insights
+  </button>
+  <button class="tab" onclick="switchTab('tendencias')">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    Temas em Alta
+  </button>
+</div>
+
+<div class="content">
+
+  <!-- ══════════ CALENDÁRIO ══════════ -->
+  <div id="view-calendario" class="view active">
+    <div class="section-head">
+      <div>
+        <div class="section-title">Calendário Editorial</div>
+        <div class="section-sub">Clique em qualquer dia para ver, adicionar ou remover posts</div>
+      </div>
+    </div>
+    <div class="cal-nav">
+      <div style="display:flex;gap:6px">
+        <button class="cal-btn" onclick="changeMonth(-1)">&#8249;</button>
+        <button class="cal-btn" onclick="changeMonth(1)">&#8250;</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="cal-month-label" id="cal-month-label"></span>
+        <select class="cal-year-sel" id="cal-year-sel" onchange="changeYear(this.value)"></select>
+      </div>
+      <button class="cal-today-btn" onclick="goToday()">Hoje</button>
+    </div>
+    <div class="cal-grid" id="cal-grid">
+      <div class="cal-day-label">Dom</div><div class="cal-day-label">Seg</div><div class="cal-day-label">Ter</div>
+      <div class="cal-day-label">Qua</div><div class="cal-day-label">Qui</div><div class="cal-day-label">Sex</div><div class="cal-day-label">Sáb</div>
+    </div>
+    <div class="cal-legend">
+      <span style="font-size:.72rem;color:var(--text-dim);margin-right:4px;align-self:center">Categorias:</span>
+      <div class="cal-legend-item"><div class="legend-dot cat-a"></div>A</div>
+      <div class="cal-legend-item"><div class="legend-dot cat-b"></div>B</div>
+      <div class="cal-legend-item"><div class="legend-dot cat-c"></div>C</div>
+      <div class="cal-legend-item"><div class="legend-dot cat-d"></div>D</div>
+      <div class="cal-legend-item"><div class="legend-dot cat-e"></div>E</div>
+      <div class="cal-legend-item"><div class="legend-dot cat-f"></div>F</div>
+      <div class="cal-legend-item"><div class="legend-dot cat-g"></div>G</div>
+      <span style="font-size:.72rem;color:var(--text-dim);margin-left:12px;align-self:center">✅ = realizado</span>
+    </div>
+  </div>
+
+  <!-- ══════════ BANCO DE TEMAS ══════════ -->
+  <div id="view-banco" class="view">
+    <div class="section-head">
+      <div>
+        <div class="section-title">Banco de Temas</div>
+        <div class="section-sub" id="banco-sub">90 temas prontos para transformar em conteúdo</div>
+      </div>
+    </div>
+
+    <!-- Nível 1: Área -->
+    <div class="filter-group">
+      <div class="filter-group-label">Área de Direito</div>
+      <div class="filters" id="area-filters">
+        <button class="filter-btn active" onclick="filterArea('todos')">Todos</button>
+        <button class="filter-btn" onclick="filterArea('SM')">Salário Maternidade</button>
+        <button class="filter-btn" onclick="filterArea('BPC')">BPC · Criança Autista</button>
+        <button class="filter-btn" onclick="filterArea('AR')">Aposentadoria Rural</button>
+        <button class="filter-btn" onclick="filterArea('AE')">Aposentadoria Especial</button>
+        <button class="filter-btn" onclick="filterArea('AA')">Auxílio Acidente</button>
+        <button class="filter-btn" onclick="filterArea('PM')">Pensão por Morte</button>
+      </div>
+    </div>
+
+    <div class="filter-divider"></div>
+
+    <!-- Nível 2: Categoria (dinâmico por área) -->
+    <div class="filter-group">
+      <div class="filter-group-label">Categoria</div>
+      <div class="filters" id="cat-filters"></div>
+    </div>
+
+    <div class="theme-list" id="theme-list"></div>
+  </div>
+
+  <!-- ══════════ ROTEIROS ══════════ -->
+  <div id="view-roteiros" class="view">
+    <div class="section-head">
+      <div>
+        <div class="section-title">Roteiros Prontos</div>
+        <div class="section-sub">Modelo de gancho estruturado para Reels e Carrossel</div>
+      </div>
+    </div>
+    <div id="roteiro-list"></div>
+  </div>
+
+  <!-- ══════════ IMPULSIONAR ══════════ -->
+  <div id="view-impulsionar" class="view">
+    <div class="section-head">
+      <div>
+        <div class="section-title">Posts para Impulsionar</div>
+        <div class="section-sub">Temas com maior potencial de conversão e alcance</div>
+      </div>
+    </div>
+    <div class="imp-info-box">Impulsione conteúdos que já têm bom engajamento orgânico. Priorize temas de alta dúvida e amplo alcance.</div>
+    <div class="imp-area-tabs">
+      <button class="imp-area-tab active" onclick="filterImpArea('SM',this)">Salário Maternidade</button>
+      <button class="imp-area-tab" onclick="filterImpArea('BPC',this)">BPC · Autismo</button>
+      <button class="imp-area-tab" onclick="filterImpArea('AR',this)">Aposen. Rural</button>
+      <button class="imp-area-tab" onclick="filterImpArea('AE',this)">Aposen. Especial</button>
+      <button class="imp-area-tab" onclick="filterImpArea('AA',this)">Auxílio Acidente</button>
+      <button class="imp-area-tab" onclick="filterImpArea('PM',this)">Pensão por Morte</button>
+    </div>
+    <div id="imp-list"></div>
+  </div>
+
+  <!-- ══════════ INSIGHTS ══════════ -->
+  <div id="view-insights" class="view">
+    <div class="section-head">
+      <div>
+        <div class="section-title">Insights Estratégicos</div>
+        <div class="section-sub">Distribuição de conteúdo e recomendações de frequência</div>
+      </div>
+    </div>
+    <div class="metrics-grid">
+      <div class="metric-card"><div class="metric-label">Temas no banco</div><div class="metric-val">282</div></div>
+      <div class="metric-card"><div class="metric-label">Áreas cobertas</div><div class="metric-val">6</div></div>
+      <div class="metric-card"><div class="metric-label">Posts/semana ideal</div><div class="metric-val">5–7</div></div>
+      <div class="metric-card"><div class="metric-label">Semanas de conteúdo</div><div class="metric-val">~47</div></div>
+    </div>
+    <div class="insight-section">
+      <div class="insight-title">Distribuição — Salário Maternidade</div>
+      <div id="cat-bars-sm"></div>
+    </div>
+    <div class="insight-section">
+      <div class="insight-title">Distribuição — BPC Criança Autista</div>
+      <div id="cat-bars-bpc"></div>
+    </div>
+    <div class="insight-section">
+      <div class="insight-title">Distribuição — Aposentadoria Rural</div>
+      <div id="cat-bars-ar"></div>
+    </div>
+    <div class="insight-section">
+      <div class="insight-title">Distribuição — Aposentadoria Especial</div>
+      <div id="cat-bars-ae"></div>
+    </div>
+    <div class="insight-section">
+      <div class="insight-title">Distribuição — Auxílio Acidente</div>
+      <div id="cat-bars-aa"></div>
+    </div>
+    <div class="insight-section">
+      <div class="insight-title">Distribuição — Pensão por Morte</div>
+      <div id="cat-bars-pm"></div>
+    </div>
+    <div class="insight-section">
+      <div class="insight-title">Dicas estratégicas</div>
+      <div class="tip-card">🔥 <strong>Desemprego + maternidade</strong> (SM-A) — altíssimo engajamento, priorize para Reels orgânicos.</div>
+      <div class="tip-card">⚠️ <strong>INSS negou o BPC</strong> (BPC-D) — gera raiva e compartilhamento imediato. Ideal para impulsionar.</div>
+      <div class="tip-card">⏱ <strong>Prazos e mitos</strong> (SM-B) — geram salvamentos, ideais para carrosséis.</div>
+      <div class="tip-card">❤️ <strong>Filho autista × renda familiar</strong> (BPC-B) — dúvida prática que todo mundo tem.</div>
+      <div class="tip-card">💰 <strong>Valores e processo</strong> (SM-F / BPC-E) — convertem mais em consultas, ótimos para impulsionar.</div>
+    </div>
+    <div class="insight-section">
+      <div class="insight-title">Frequência ideal</div>
+      <div class="freq-box">
+        <div><strong>Seg · Qua · Sex</strong> — Reels Isca Cultural (alcance)</div>
+        <div><strong>Ter · Qui</strong> — Reels Essência Autêntica (autoridade)</div>
+        <div><strong>Sáb</strong> — Carrossel resumo ou dicas</div>
+        <div style="margin-top:8px;font-size:.75rem;color:var(--text-second)">1–2× por semana: conteúdo patrocinado nos temas de maior conversão</div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══════════ TEMAS EM ALTA ══════════ -->
+  <div id="view-tendencias" class="view">
+    <div class="section-head">
+      <div>
+        <div class="section-title">Temas em Alta</div>
+        <div class="section-sub">Gerado automaticamente todo domingo via análise dos 10 concorrentes monitorados</div>
+      </div>
+    </div>
+    <div class="trend-header-bar" id="trend-meta">
+      <span>🔄 Buscando dados mais recentes...</span>
+    </div>
+    <div id="trend-container">
+      <div class="trend-loading"><div class="trend-spinner"></div> Carregando temas em alta...</div>
+    </div>
+  </div>
+
+</div><!-- /.content -->
+
+<!-- ══════════ DAY DETAIL MODAL ══════════ -->
+<div class="modal-bg" id="day-modal-bg">
+  <div class="modal">
+    <div class="modal-title">
+      <span id="day-modal-title">—</span>
+      <button class="modal-close" onclick="closeDayModal()">✕</button>
+    </div>
+    <div class="day-post-list" id="day-post-list"></div>
+    <button class="btn-add-to-day" onclick="openAddFromDay()">+ Adicionar post neste dia</button>
+  </div>
+</div>
+
+<!-- ══════════ ADD/EDIT MODAL ══════════ -->
+<div class="modal-bg" id="add-modal-bg">
+  <div class="modal">
+    <div class="modal-title">
+      <span>Agendar Postagem</span>
+      <button class="modal-close" onclick="closeAddModal()">✕</button>
+    </div>
+    <label>Tema selecionado</label>
+    <div class="modal-tema-box" id="modal-tema"></div>
+    <div class="modal-row">
+      <div>
+        <label>Data</label>
+        <input type="date" id="modal-data" />
+      </div>
+      <div>
+        <label>Horário</label>
+        <input type="time" id="modal-hora" value="18:00" />
+      </div>
+    </div>
+    <label>Tipo de post</label>
+    <select id="modal-tipo">
+      <option value="reels">Reels</option>
+      <option value="carrossel">Carrossel</option>
+      <option value="patrocinado">Patrocinado</option>
+    </select>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeAddModal()">Cancelar</button>
+      <button class="btn-primary" onclick="confirmAdd()">Agendar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════
+   DATA
+═══════════════════════════════════════════════ */
+// area: 'SM'=Salário Maternidade | 'BPC'=BPC Criança Autista | 'AR'=Aposen. Rural | 'AE'=Aposen. Especial | 'AA'=Auxílio Acidente | 'PM'=Pensão por Morte
+// n: SM=1-48, BPC=101-142, AR=201-248, AE=301-348, AA=401-448, PM=501-548
+
+const TEMAS = [
+  // ── SALÁRIO MATERNIDADE ─────────────────────────────────────────
+  // Cat A — Trabalho
+  {n:1,area:'SM',cat:'A',q:'Tô sem trabalhar… ainda consigo pedir salário-maternidade?',tip:'Explique o conceito de "período de graça". Quem já trabalhou de carteira assinada mantém o direito por um tempo mesmo desempregada.'},
+  {n:2,area:'SM',cat:'A',q:'Tenho uma lojinha de perfume no meu nome. Isso me impede de receber salário-maternidade?',tip:'Ter CNPJ (como MEI) não impede, desde que esteja contribuindo corretamente para o INSS.'},
+  {n:3,area:'SM',cat:'A',q:'Faço unha em casa e vendo umas coisinhas… será que tenho direito ao salário-maternidade?',tip:'Aborde o trabalho informal e como a contribuição como contribuinte individual (autônoma) garante o benefício.'},
+  {n:4,area:'SM',cat:'A',q:'Vendo semijoias pelo Instagram. Posso receber salário-maternidade?',tip:'Reforce a importância de formalizar a contribuição para garantir a proteção previdenciária.'},
+  {n:5,area:'SM',cat:'A',q:'Nunca trabalhei de carteira assinada. Posso pedir salário-maternidade?',tip:'A carteira assinada não é a única forma, mas é necessário ter algum tipo de contribuição.'},
+  {n:6,area:'SM',cat:'A',q:'Trabalho como diarista. Tenho direito ao salário-maternidade?',tip:'A diarista é contribuinte individual e precisa pagar o carnê do INSS para ter direito.'},
+  {n:7,area:'SM',cat:'A',q:'Faço bolo e doces para vender. Posso pedir salário-maternidade?',tip:'Incentive a formalização como MEI ou o pagamento como autônoma.'},
+  {n:8,area:'SM',cat:'A',q:'Vendo roupas pelo WhatsApp. Isso ajuda no pedido de salário-maternidade?',tip:'O trabalho informal precisa ser vinculado à contribuição previdenciária para gerar direito.'},
+  {n:9,area:'SM',cat:'A',q:'Paguei o INSS como dona de casa. Posso receber salário-maternidade?',tip:'A segurada facultativa (dona de casa) tem direito, desde que cumpra a carência de 10 contribuições.'},
+  // Cat B — Prazos
+  {n:10,area:'SM',cat:'B',q:'Meu filho já tem 7 meses… ainda dá tempo de pedir salário-maternidade?',tip:'Explique o prazo decadencial de 5 anos para pedir o benefício após o nascimento.'},
+  {n:11,area:'SM',cat:'B',q:'Ouvi falar que se eu pedir depois que o bebê nasce, eu perco o salário-maternidade. É verdade?',tip:'Desminta esse mito. O benefício pode ser pedido até 5 anos após o parto.'},
+  {n:12,area:'SM',cat:'B',q:'Estou grávida agora. Já posso pedir salário-maternidade?',tip:'O benefício pode ser solicitado a partir de 28 dias antes do parto (com atestado médico) ou após o nascimento.'},
+  {n:13,area:'SM',cat:'B',q:'Quanto tempo demora para sair o salário-maternidade?',tip:'Fale sobre os prazos médios de análise do INSS e o que fazer se demorar muito.'},
+  {n:14,area:'SM',cat:'B',q:'Estou grávida de 3 meses. Já posso pedir salário-maternidade?',tip:'Ainda é cedo para pedir, mas é o momento ideal para organizar contribuições e documentos.'},
+  {n:15,area:'SM',cat:'B',q:'Estou grávida de 8 meses. Já posso dar entrada no salário-maternidade?',tip:'A partir de 28 dias antes do parto já é possível dar entrada com atestado médico específico.'},
+  // Cat C — Carência
+  {n:16,area:'SM',cat:'C',q:'Trabalhei só alguns meses registrada. Tenho direito ao salário-maternidade?',tip:'Para carteira assinada, não há exigência de carência mínima (basta estar trabalhando no parto ou no período de graça).'},
+  {n:17,area:'SM',cat:'C',q:'Parei de pagar o INSS faz tempo. Ainda consigo pedir salário-maternidade?',tip:'Explique como funciona a perda da qualidade de segurada e as regras para recuperar esse direito.'},
+  {n:18,area:'SM',cat:'C',q:'Parei de pagar o INSS há 2 anos. Ainda consigo salário-maternidade?',tip:'O período de graça dura até 12 meses, podendo ser estendido para 24 ou 36 meses em situações específicas.'},
+  {n:19,area:'SM',cat:'C',q:'Paguei o INSS só uma vez. Já posso pedir salário-maternidade?',tip:'Para autônomas e facultativas são necessárias pelo menos 10 contribuições (carência).'},
+  {n:20,area:'SM',cat:'C',q:'Comecei a pagar o INSS grávida. Ainda dá tempo?',tip:'Explique a regra das 10 contribuições antes do parto para autônomas.'},
+  {n:21,area:'SM',cat:'C',q:'Pago o INSS como dona de casa e estou grávida. Posso receber salário-maternidade?',tip:'Sim, desde que complete as 10 contribuições antes do nascimento do bebê.'},
+  {n:22,area:'SM',cat:'C',q:'Paguei o INSS atrasado. Isso conta para salário-maternidade?',tip:'Alerte sobre os riscos do pagamento em atraso. A primeira contribuição em dia é fundamental.'},
+  // Cat D — Família
+  {n:23,area:'SM',cat:'D',q:'Meu bebê nasceu em casa e eu ainda não registrei ele. Consigo pedir salário-maternidade?',tip:'A Certidão de Nascimento é o principal documento exigido pelo INSS — essencial fazer o registro primeiro.'},
+  {n:24,area:'SM',cat:'D',q:'Trabalho na roça. Posso receber salário-maternidade?',tip:'Aborde a figura da segurada especial (trabalhadora rural) e como comprovar a atividade sem contribuições mensais.'},
+  {n:25,area:'SM',cat:'D',q:'Moro na zona rural. Tenho direito ao salário-maternidade?',tip:'Detalhe os documentos necessários para comprovar o trabalho rural.'},
+  {n:26,area:'SM',cat:'D',q:'Meu marido trabalha. Isso atrapalha meu salário-maternidade?',tip:'O direito ao salário-maternidade é individual da mãe e não depende da renda ou do trabalho do marido.'},
+  {n:27,area:'SM',cat:'D',q:'Sou mãe solo. Isso muda algo no salário-maternidade?',tip:'As regras de concessão são as mesmas, mas traga empatia ao vídeo, destacando a importância desse amparo financeiro.'},
+  {n:28,area:'SM',cat:'D',q:'Tive bebê prematuro. Isso muda algo no salário-maternidade?',tip:'Explique a decisão do STF que prorroga o salário-maternidade em caso de internações longas decorrentes de parto prematuro.'},
+  {n:29,area:'SM',cat:'D',q:'Fiz cesárea. Tenho direito ao salário-maternidade?',tip:'O tipo de parto (normal ou cesárea) não altera o direito ao benefício.'},
+  {n:30,area:'SM',cat:'D',q:'Adotei uma criança. Tenho direito ao salário-maternidade?',tip:'Sim! O adotante (inclusive homem, em casos específicos) tem direito, e a duração é a mesma.'},
+  {n:31,area:'SM',cat:'D',q:'Perdi o bebê durante a gravidez. Posso receber salário-maternidade?',tip:'Aborde com extrema sensibilidade o direito em caso de parto natimorto ou aborto não criminoso (a partir da 23ª semana).'},
+  // Cat E — Acúmulo
+  {n:32,area:'SM',cat:'E',q:'É verdade que quem recebe Bolsa Família não pode receber salário-maternidade?',tip:'O Bolsa Família não impede o recebimento, mas pode haver suspensão temporária durante os 4 meses do benefício.'},
+  {n:33,area:'SM',cat:'E',q:'Já recebo pensão. Posso receber salário-maternidade também?',tip:'A pensão por morte e o salário-maternidade são acumuláveis — têm fatos geradores diferentes.'},
+  {n:34,area:'SM',cat:'E',q:'Já recebo outro benefício do INSS. Posso pedir salário-maternidade?',tip:'Explique quais benefícios podem e quais não podem ser acumulados.'},
+  {n:35,area:'SM',cat:'E',q:'Recebo BPC. Posso pedir salário-maternidade?',tip:'O BPC é benefício assistencial, não previdenciário — não é possível acumular os dois.'},
+  {n:36,area:'SM',cat:'E',q:'Recebo auxílio-doença. Posso receber salário-maternidade?',tip:'Durante o salário-maternidade, o auxílio-doença é suspenso, sendo restabelecido após os 120 dias se a incapacidade persistir.'},
+  {n:37,area:'SM',cat:'E',q:'Recebo pensão por morte. Posso pedir salário-maternidade também?',tip:'A acumulação é perfeitamente legal e permitida pela lei previdenciária.'},
+  // Cat F — Processo
+  {n:38,area:'SM',cat:'F',q:'O INSS negou meu salário-maternidade. Agora perdi tudo?',tip:'A negativa do INSS pode ser revertida na Justiça ou por meio de recurso administrativo bem fundamentado.'},
+  {n:39,area:'SM',cat:'F',q:'Quanto realmente o INSS paga de salário-maternidade?',tip:'Explique o cálculo para empregadas (salário integral), autônomas (média das contribuições) e rurais (um salário mínimo).'},
+  {n:40,area:'SM',cat:'F',q:'Perdi meus documentos. Consigo pedir salário-maternidade mesmo assim?',tip:'Oriente sobre como obter segundas vias e quais documentos alternativos o INSS pode aceitar.'},
+  {n:41,area:'SM',cat:'F',q:'Não tenho conta no banco. Como recebo o salário-maternidade?',tip:'O INSS abre uma conta de benefício específica para saque ou o pagamento pode ser feito por cartão magnético.'},
+  {n:42,area:'SM',cat:'F',q:'Meu nome está sujo. Isso impede o salário-maternidade?',tip:'O INSS não faz consulta ao SPC/Serasa para conceder benefícios previdenciários.'},
+  {n:43,area:'SM',cat:'F',q:'O salário-maternidade cai todo mês ou vem tudo junto?',tip:'Se pedido logo após o parto, é pago mensalmente (4 parcelas). Se pedido meses depois, o INSS costuma pagar as parcelas vencidas acumuladas.'},
+  {n:44,area:'SM',cat:'F',q:'Preciso pagar advogado para pedir salário-maternidade?',tip:'O pedido pode ser feito diretamente no Meu INSS, mas a contratação de advogado especialista é recomendada em casos complexos ou com negativa.'},
+  {n:45,area:'SM',cat:'F',q:'O salário-maternidade pode ser pedido pela internet?',tip:'Explique o funcionamento do portal e aplicativo "Meu INSS" — o processo é 100% digital.'},
+  {n:46,area:'SM',cat:'F',q:'Meu pedido de salário-maternidade está parado. O que faço?',tip:'O INSS tem prazo legal de 45 dias para analisar. Em caso de demora abusiva, é possível impetrar Mandado de Segurança.'},
+  {n:47,area:'SM',cat:'F',q:'O INSS pediu exigência no salário-maternidade. E agora?',tip:'Explique o que é a "carta de exigência" e a importância de cumprir o prazo de 30 dias para apresentar os documentos.'},
+  {n:48,area:'SM',cat:'F',q:'Posso pedir salário-maternidade mesmo sem o pai registrar a criança?',tip:'O benefício é um direito da mãe trabalhadora/contribuinte e não depende do reconhecimento da paternidade.'},
+
+  // ── BPC — CRIANÇA AUTISTA ────────────────────────────────────────
+  // Cat A — O que é e quem tem direito
+  {n:101,area:'BPC',cat:'A',q:'Meu filho tem autismo. Ele tem direito ao BPC?',tip:'Explique que o autismo é reconhecido como deficiência pelo INSS desde 2013 (Lei Berenice Piana). O BPC pode ser concedido desde o nascimento.'},
+  {n:102,area:'BPC',cat:'A',q:'O que é o BPC e por que meu filho autista pode receber?',tip:'Apresente o benefício de forma simples: um salário mínimo por mês pago pelo governo para quem tem deficiência e baixa renda familiar.'},
+  {n:103,area:'BPC',cat:'A',q:'BPC é a mesma coisa que aposentadoria por invalidez?',tip:'Desminta a confusão. BPC é assistencial (não precisa de contribuição ao INSS) e aposentadoria é previdenciária (exige contribuição).'},
+  {n:104,area:'BPC',cat:'A',q:'Autismo leve também dá direito ao BPC?',tip:'Aborde os níveis de suporte (1, 2 e 3). Qualquer nível pode dar direito, mas o laudo médico precisa comprovar o impacto na vida do menor.'},
+  {n:105,area:'BPC',cat:'A',q:'Minha filha tem TDAH e autismo. Os dois juntos ajudam no BPC?',tip:'Comorbidades fortalecem o laudo. Explique como a avaliação multiprofissional é levada em conta pelo perito do INSS.'},
+  // Cat B — Renda familiar e elegibilidade
+  {n:106,area:'BPC',cat:'B',q:'Meu marido trabalha. Isso impede o BPC do meu filho autista?',tip:'A renda per capita familiar precisa ser igual ou menor a 1/4 do salário mínimo. Explique o cálculo de forma prática com exemplos reais.'},
+  {n:107,area:'BPC',cat:'B',q:'Quanto a família pode ganhar para ter direito ao BPC?',tip:'Use o valor atual do salário mínimo. Calcule: salário mínimo ÷ 4 ÷ número de membros da família.'},
+  {n:108,area:'BPC',cat:'B',q:'O BPC do meu filho conta na renda da família para pedir o de outro filho?',tip:'Por lei, o BPC de pessoa com deficiência não entra no cálculo de renda para concessão de outro BPC na mesma família.'},
+  {n:109,area:'BPC',cat:'B',q:'Recebo pensão alimentícia. Isso entra no cálculo de renda do BPC?',tip:'A pensão alimentícia pode ou não entrar dependendo da interpretação administrativa — ponto controverso que merece análise profissional.'},
+  {n:110,area:'BPC',cat:'B',q:'Moro com meus pais e irmãos. Quem entra no cálculo de renda?',tip:'Explique o conceito de "grupo familiar" para o BPC: cônjuge, filhos, pais e irmãos que vivem na mesma casa e dividem despesas.'},
+  {n:111,area:'BPC',cat:'B',q:'Meu marido está desempregado. Isso ajuda no pedido do BPC?',tip:'Sim — a ausência de renda reduz a renda per capita familiar. Oriente sobre os documentos que comprovam a situação de desemprego.'},
+  // Cat C — Laudos, diagnóstico e documentação
+  {n:112,area:'BPC',cat:'C',q:'Meu filho ainda não tem o diagnóstico oficial. Posso pedir o BPC?',tip:'Sem CID ou laudo médico o INSS não reconhece a deficiência. Oriente a buscar avaliação com neuropediatra, psiquiatra infantil ou psicólogo.'},
+  {n:113,area:'BPC',cat:'C',q:'Que documentos preciso para pedir o BPC do meu filho autista?',tip:'Liste de forma clara: RG/CPF da criança e responsáveis, comprovante de renda, residência, laudo médico com CID F84 e relatório terapêutico.'},
+  {n:114,area:'BPC',cat:'C',q:'O laudo do SUS vale para o BPC ou precisa ser de médico particular?',tip:'O laudo do SUS tem o mesmo valor que o particular para o INSS. O que importa é o conteúdo técnico.'},
+  {n:115,area:'BPC',cat:'C',q:'O INSS negou porque o laudo estava incompleto. O que faço agora?',tip:'Explique como complementar o laudo com relatórios do CAPS, escola especial, terapeuta ocupacional e fonoaudiólogo para fortalecer o recurso.'},
+  {n:116,area:'BPC',cat:'C',q:'Meu filho tem acompanhamento no CAPS. Isso ajuda no laudo do BPC?',tip:'Sim — os relatórios do CAPS, da escola especial e dos terapeutas são documentos complementares valiosos para compor o processo.'},
+  // Cat D — Negativa do INSS e recursos
+  {n:117,area:'BPC',cat:'D',q:'O INSS negou o BPC do meu filho. Agora perdi tudo?',tip:'A negativa pode ser revertida por recurso administrativo na Junta de Recursos do INSS ou por ação judicial. O prazo para recurso é de 30 dias.'},
+  {n:118,area:'BPC',cat:'D',q:'O perito do INSS disse que meu filho não tem deficiência. Isso é definitivo?',tip:'Não. A avaliação pericial pode ser contestada com laudos complementares e o caso pode ser levado à Justiça com chances reais de êxito.'},
+  {n:119,area:'BPC',cat:'D',q:'Já recorri no INSS e negaram de novo. Ainda tenho saída?',tip:'Após esgotada a via administrativa, é possível ingressar com ação no Juizado Especial Federal (JEF) sem custo para a família.'},
+  {n:120,area:'BPC',cat:'D',q:'Podem pagar o BPC do meu filho pelos meses em que ele foi negado?',tip:'Sim — se for comprovado que o direito existia desde a data do pedido, o INSS deve pagar as parcelas atrasadas (DIB retroativa).'},
+  {n:121,area:'BPC',cat:'D',q:'O INSS cancelou o BPC do meu filho. Posso recuperar?',tip:'Explique as causas de cancelamento (revisão bienal, mudança de renda) e como contestar administrativamente ou judicialmente.'},
+  // Cat E — Processo, prazos e pagamento
+  {n:122,area:'BPC',cat:'E',q:'Quanto tempo demora para sair o BPC do meu filho autista?',tip:'O prazo legal é de 45 dias. Na prática pode levar mais. Explique como acompanhar pelo Meu INSS e quando agir em caso de demora.'},
+  {n:123,area:'BPC',cat:'E',q:'O BPC pode ser pedido pela internet ou precisa ir à agência?',tip:'O pedido é feito pelo portal e app Meu INSS. A perícia médica e social ainda pode exigir presença, dependendo do caso.'},
+  {n:124,area:'BPC',cat:'E',q:'Quanto meu filho vai receber de BPC?',tip:'O valor é sempre de 1 salário mínimo por mês. Atualize o valor atual para o vídeo ter relevância imediata.'},
+  {n:125,area:'BPC',cat:'E',q:'Meu filho vai perder o BPC quando completar 18 anos?',tip:'Não necessariamente. Ao completar 18 anos, o BPC passa a ser avaliado com os critérios do adulto, mas pode ser mantido se a deficiência e a baixa renda persistirem.'},
+  {n:126,area:'BPC',cat:'E',q:'Meu filho já tem 15 anos. Ainda dá tempo de pedir o BPC?',tip:'Sim — pode pedir até 5 anos retroativos se comprovar que a deficiência e a baixa renda existiam antes. O histórico médico é fundamental.'},
+  {n:127,area:'BPC',cat:'E',q:'O BPC do meu filho cai na minha conta ou na conta dele?',tip:'Para menores, o benefício é pago ao responsável legal mediante cadastro no Meu INSS. Explique como funciona o recadastramento anual.'},
+  // Cat F — Acúmulo com outros benefícios
+  {n:128,area:'BPC',cat:'F',q:'Quem recebe Bolsa Família pode pedir o BPC para o filho autista?',tip:'BPC e Bolsa Família não podem ser acumulados. Ao receber o BPC, o Bolsa Família é cancelado — mas o BPC costuma ter valor maior.'},
+  {n:129,area:'BPC',cat:'F',q:'Já recebo BPC. Meu filho autista pode receber também?',tip:'Cada pessoa com deficiência pode ter seu próprio BPC. O BPC de um membro da família não entra no cálculo de renda do outro.'},
+  {n:130,area:'BPC',cat:'F',q:'Meu filho recebe pensão alimentícia. Isso cancela o BPC?',tip:'Depende — a pensão pode ou não entrar no cálculo de renda. Esse é um ponto que precisa de análise individual.'},
+  {n:131,area:'BPC',cat:'F',q:'O filho autista pode receber BPC e também pensão por morte do pai?',tip:'O BPC e a pensão por morte não podem ser acumulados — a regra geral proíbe acúmulo de dois benefícios pagos pelo governo ao mesmo beneficiário.'},
+  // Cat G — Situações especiais e direitos ampliados
+  {n:132,area:'BPC',cat:'G',q:'Meu filho autista tem direito à carteirinha de pessoa com deficiência?',tip:'Sim — a carteirinha (CID) é emitida pela prefeitura e garante transporte gratuito, meia-entrada e outros benefícios além do BPC.'},
+  {n:133,area:'BPC',cat:'G',q:'A escola pode negar matrícula ao meu filho autista?',tip:'Não. A inclusão escolar é garantida por lei. Aborde brevemente e direcione para o direito educacional como conteúdo complementar.'},
+  {n:134,area:'BPC',cat:'G',q:'Meu filho autista tem direito à isenção do IPTU?',tip:'Depende da lei municipal de cada cidade. Oriente a pesquisar a legislação local — ótimo gancho para seguidores de regiões específicas.'},
+  {n:135,area:'BPC',cat:'G',q:'O pai também pode ser o responsável pelo BPC do filho autista?',tip:'Sim — qualquer responsável legal (pai, mãe, tutor) pode ser o representante para recebimento do benefício.'},
+  {n:136,area:'BPC',cat:'G',q:'Adotei uma criança autista. Ela tem direito ao BPC?',tip:'Sim — a criança adotada tem todos os mesmos direitos. A adoção não é impeditivo para nenhum benefício previdenciário ou assistencial.'},
+  {n:137,area:'BPC',cat:'G',q:'Meu filho ficou internado por meses. Isso afeta o BPC?',tip:'Internações longas em hospital público podem suspender o BPC. Explique a regra e a importância de comunicar o INSS para evitar cobranças de devolução.'},
+  {n:138,area:'BPC',cat:'G',q:'Moro na zona rural e meu filho tem autismo. Tenho direito ao BPC?',tip:'Sim — o BPC é um direito nacional, independente da zona rural ou urbana. Destaque que muitas famílias do campo não sabem disso.'},
+  {n:139,area:'BPC',cat:'G',q:'Posso pedir o BPC do meu filho mesmo com nome sujo?',tip:'Sim — o INSS não consulta SPC/Serasa para concessão de benefícios assistenciais. Nome sujo não é impedimento.'},
+  {n:140,area:'BPC',cat:'G',q:'Meu filho tem autismo e também epilepsia. Isso conta para o BPC?',tip:'Comorbidades somam impacto funcional. Um laudo que descreve as limitações geradas pelas duas condições juntas tende a ser mais robusto na perícia.'},
+  {n:141,area:'BPC',cat:'G',q:'Quantos anos meu filho precisa ter para pedir o BPC?',tip:'Não há idade mínima. O BPC pode ser pedido desde o nascimento, desde que o diagnóstico esteja documentado.'},
+  {n:142,area:'BPC',cat:'G',q:'Preciso pagar advogado para pedir o BPC do meu filho?',tip:'O pedido inicial pode ser feito pelo Meu INSS sem custo. Em casos de negativa ou recurso judicial, um advogado especialista faz diferença real no resultado.'},
+
+  // ── APOSENTADORIA RURAL ─────────────────────────────────────────
+  // Cat A — Quem tem Direito e Como Comprovar
+  {n:201,area:'AR',cat:'A',q:'Trabalhei a vida toda na roça mas nunca paguei o INSS. Perdi minha aposentadoria?',tip:'Explique a figura do Segurado Especial — o trabalhador rural que não precisa pagar contribuições mensais para ter direito à aposentadoria.'},
+  {n:202,area:'AR',cat:'A',q:'Moro no sítio mas também faço uns bicos na cidade. Ainda tenho direito à aposentadoria rural?',tip:'Aborde as regras de manutenção da qualidade de Segurado Especial e quando o trabalho urbano eventual descaracteriza o vínculo rural.'},
+  {n:203,area:'AR',cat:'A',q:'Planto só para comer. Isso conta como trabalho rural para o INSS?',tip:'Explique que a subsistência em regime de economia familiar é suficiente, não sendo necessária a venda da produção.'},
+  {n:204,area:'AR',cat:'A',q:'Sou meeira numa fazenda. Tenho direito à aposentadoria rural?',tip:'O regime de meação enquadra-se como Segurado Especial em regime de parceria/meia.'},
+  {n:205,area:'AR',cat:'A',q:'Trabalho em terra dos outros como diarista rural. Tenho direito à aposentadoria como rural?',tip:'Diferencie o diarista rural (boia-fria) do empregado rural — cada um tem forma diferente de contribuição e comprovação.'},
+  {n:206,area:'AR',cat:'A',q:'Nunca tive contrato de trabalho na fazenda. Como comprovo meu tempo rural?',tip:'Liste os documentos alternativos aceitos pelo INSS: declarações de sindicatos, notas fiscais de produção, ITR, contratos verbais com testemunhas.'},
+  {n:207,area:'AR',cat:'A',q:'O INSS aceita testemunha para comprovar trabalho rural?',tip:'Sim, a prova testemunhal tem papel importante, mas precisa ser combinada com início de prova material.'},
+  {n:208,area:'AR',cat:'A',q:'Perdi todos os documentos de quando trabalhei na roça. Perdi o direito à aposentadoria rural?',tip:'Explique como obter documentos alternativos (ITR, certidões, declarações de sindicatos rurais, blocos do produtor).'},
+  {n:209,area:'AR',cat:'A',q:'Trabalho no campo mas também tenho um pequeno mercadinho. Isso cancela minha aposentadoria rural?',tip:'Atividades comerciais paralelas podem descaracterizar o Segurado Especial — é preciso análise cuidadosa do caso.'},
+  // Cat B — Idade e Tempo de Trabalho
+  {n:210,area:'AR',cat:'B',q:'Quantos anos preciso ter para me aposentar como trabalhador rural?',tip:'Homens: 60 anos. Mulheres: 55 anos. Com 15 anos de efetiva atividade rural comprovada.'},
+  {n:211,area:'AR',cat:'B',q:'Tenho 58 anos e trabalhei no campo a vida toda. Já posso pedir aposentadoria rural?',tip:'Mulheres com 55 anos e 15 anos de atividade rural já têm direito. Para homens, são 60 anos.'},
+  {n:212,area:'AR',cat:'B',q:'Trabalhei 20 anos na roça e 10 anos na cidade. Como fica minha aposentadoria?',tip:'Explique a possibilidade de somar tempos e a hipótese de aposentadoria híbrida ou por tempo de contribuição.'},
+  {n:213,area:'AR',cat:'B',q:'Comecei a trabalhar na roça com 12 anos. Esse tempo conta para aposentadoria?',tip:'O tempo de trabalho rural antes dos 16 anos conta para aposentadoria, mas com análise específica.'},
+  {n:214,area:'AR',cat:'B',q:'Posso me aposentar mais cedo por ser do campo?',tip:'Sim — a redução de 5 anos na idade mínima é uma proteção constitucional ao trabalhador rural.'},
+  {n:215,area:'AR',cat:'B',q:'Trabalhei só 10 anos na roça. Tenho direito a alguma aposentadoria rural?',tip:'Com menos de 15 anos de atividade comprovada, não há direito à aposentadoria por idade rural — explique alternativas como o BPC.'},
+  // Cat C — Documentos e Processo no INSS
+  {n:216,area:'AR',cat:'C',q:'Quais documentos preciso para pedir aposentadoria rural?',tip:'Liste os principais: ITR, notas fiscais de venda da produção, declaração do sindicato rural, contrato de arrendamento, certidão de imóvel rural.'},
+  {n:217,area:'AR',cat:'C',q:'O INSS negou minha aposentadoria rural por falta de documento. E agora?',tip:'A negativa administrativa pode ser revertida judicialmente com a reunião adequada de provas materiais e testemunhais.'},
+  {n:218,area:'AR',cat:'C',q:'Como funciona a declaração do sindicato rural para aposentadoria?',tip:'Explique o papel dos sindicatos rurais como emissores de declarações de atividade — documento relevante como início de prova material.'},
+  {n:219,area:'AR',cat:'C',q:'O INSS pode investigar se eu realmente trabalhei na roça?',tip:'Sim, o INSS pode realizar pesquisa externa e entrevistas. A consistência dos documentos e das declarações é fundamental.'},
+  {n:220,area:'AR',cat:'C',q:'Tenho o bloco do produtor rural no meu nome. Isso garante minha aposentadoria?',tip:'O bloco do produtor é um dos documentos mais fortes como prova material, mas isoladamente não basta — precisa de conjunto probatório.'},
+  {n:221,area:'AR',cat:'C',q:'O INSS pediu perícia rural. O que vai acontecer?',tip:'A pesquisa rural é um procedimento do INSS para verificar o exercício da atividade. Explique como funciona e como se preparar.'},
+  {n:222,area:'AR',cat:'C',q:'Quanto tempo demora o pedido de aposentadoria rural no INSS?',tip:'O prazo legal é de 45 dias. Casos complexos com muita documentação podem demorar mais ou exigir ação judicial.'},
+  // Cat D — Situações Especiais e Familiares
+  {n:223,area:'AR',cat:'D',q:'Minha mãe trabalhou na roça mas nunca pediu aposentadoria e faleceu. Posso pedir pelos anos dela?',tip:'Não há transmissão hereditária da aposentadoria não concedida, mas pode haver direito à pensão por morte ou análise de parcelas em atraso.'},
+  {n:224,area:'AR',cat:'D',q:'Trabalho na roça junto com meu marido. Só ele tem direito à aposentadoria rural?',tip:'Ambos têm direito — marido e esposa que trabalham em regime de economia familiar são Segurados Especiais individualmente.'},
+  {n:225,area:'AR',cat:'D',q:'Minha esposa sempre trabalhou comigo na lavoura mas nunca teve documento. Ela tem direito?',tip:'Sim! O cônjuge que trabalha na atividade rural da família tem direito como Segurado Especial, mesmo sem documentação própria.'},
+  {n:226,area:'AR',cat:'D',q:'Trabalho em assentamento do MST. Tenho direito à aposentadoria rural?',tip:'O assentado que exerce atividade em regime familiar é considerado Segurado Especial. A documentação do assentamento é o principal documento.'},
+  {n:227,area:'AR',cat:'D',q:'Sou pescador artesanal. Tenho direito à aposentadoria rural?',tip:'Sim! O pescador artesanal é equiparado ao Segurado Especial e tem as mesmas regras de idade reduzida.'},
+  {n:228,area:'AR',cat:'D',q:'Trabalho com extrativismo (castanha, açaí, borracha). Isso conta como trabalho rural?',tip:'O extrativismo em regime familiar é reconhecido como atividade de Segurado Especial pela legislação previdenciária.'},
+  {n:229,area:'AR',cat:'D',q:'Meu pai era arrendatário e eu sempre trabalhei com ele. Posso usar essa documentação?',tip:'Documentos em nome do pai podem servir como início de prova material desde que haja prova testemunhal do trabalho em conjunto.'},
+  {n:230,area:'AR',cat:'D',q:'Criei meus filhos trabalhando na roça. Eles terão direito à aposentadoria rural também?',tip:'Os filhos que trabalharam em regime de economia familiar na infância/juventude podem ter esse tempo reconhecido.'},
+  {n:231,area:'AR',cat:'D',q:'Sou indígena e trabalho na aldeia com agricultura. Tenho direito à aposentadoria rural?',tip:'Indígenas em atividade rural têm direitos previdenciários, com legislação específica — o tema merece conteúdo aprofundado.'},
+  // Cat E — Valores, Cálculo e Acúmulo
+  {n:232,area:'AR',cat:'E',q:'Quanto vou receber de aposentadoria rural?',tip:'O Segurado Especial recebe 1 salário mínimo. Quem contribuiu como empregado rural pode ter valor maior conforme cálculo do INSS.'},
+  {n:233,area:'AR',cat:'E',q:'A aposentadoria rural paga mais do que um salário mínimo?',tip:'Para o Segurado Especial puro, não. Para quem tem tempo de contribuição registrado, o cálculo é diferente.'},
+  {n:234,area:'AR',cat:'E',q:'Posso receber aposentadoria rural e ainda trabalhar?',tip:'O aposentado rural pode trabalhar, mas há regras — se voltar a contribuir como empregado, pode ter impactos no benefício.'},
+  {n:235,area:'AR',cat:'E',q:'Posso acumular aposentadoria rural com Bolsa Família?',tip:'O Bolsa Família é cancelado quando há concessão de aposentadoria pelo INSS — explique essa regra com clareza.'},
+  {n:236,area:'AR',cat:'E',q:'Recebi o BPC por anos. Agora consigo aposentadoria rural em vez disso?',tip:'BPC e aposentadoria rural não se acumulam. Se reunir requisitos para a aposentadoria, pode ser mais vantajoso — análise caso a caso.'},
+  {n:237,area:'AR',cat:'E',q:'O INSS pode me pagar os anos atrasados da aposentadoria rural que não pedi antes?',tip:'Sim! O INSS paga retroativamente desde a data do requerimento — e em casos judiciais, desde a data da citação ou do pedido administrativo.'},
+  // Cat F — Negativas, Recursos e Ação Judicial
+  {n:238,area:'AR',cat:'F',q:'O INSS negou minha aposentadoria rural dizendo que não tenho prova. Posso recorrer?',tip:'Sim! É possível recurso administrativo no CRPS ou ação judicial na Justiça Federal ou nos JEFs (Juizados Especiais Federais).'},
+  {n:239,area:'AR',cat:'F',q:'Vale mais a pena recorrer no INSS ou entrar na Justiça para aposentadoria rural?',tip:'Depende da situação. A via judicial geralmente é mais eficiente para reunir provas e garantir o direito.'},
+  {n:240,area:'AR',cat:'F',q:'O advogado cobra para entrar na Justiça pela aposentadoria rural? Quanto fica?',tip:'Aborde a possibilidade de honorários por êxito e a diferença entre casos com e sem gratuidade de justiça.'},
+  {n:241,area:'AR',cat:'F',q:'Quanto tempo demora uma ação judicial para aposentadoria rural?',tip:'Varia por região. Nos JEFs, pode ser mais rápido. Explique as fases do processo de forma simples.'},
+  {n:242,area:'AR',cat:'F',q:'O juiz pode determinar que o INSS pague minha aposentadoria rural mesmo com poucos documentos?',tip:'Sim! A prova testemunhal em juízo, combinada com início de prova material, é amplamente aceita pelos tribunais.'},
+  {n:243,area:'AR',cat:'F',q:'Meu advogado falou em \'início de prova material\'. O que isso significa?',tip:'Explique de forma simples que é qualquer documento que indique a atividade rural — ponto de partida para comprovar o trabalho no campo.'},
+  {n:244,area:'AR',cat:'F',q:'O INSS pode cancelar minha aposentadoria rural depois de concedida?',tip:'Sim, o INSS pode revisar e cancelar benefícios irregulares. A documentação correta desde o início é fundamental.'},
+  {n:245,area:'AR',cat:'F',q:'Existe prazo para pedir aposentadoria rural? Posso perder o direito?',tip:'O direito à aposentadoria não prescreve enquanto os requisitos forem cumpridos, mas o pagamento retroativo tem limitações.'},
+  {n:246,area:'AR',cat:'F',q:'Meu processo de aposentadoria rural está na Justiça há 3 anos. Isso é normal?',tip:'Infelizmente, a demora judicial é comum. Explique as possibilidades de tutela antecipada e prioridade para idosos.'},
+  {n:247,area:'AR',cat:'F',q:'Posso pedir tutela de urgência para receber a aposentadoria rural enquanto o processo corre?',tip:'Sim! A tutela antecipada é cabível quando há prova suficiente e urgência comprovada — idosos acima de 60 anos têm prioridade.'},
+  {n:248,area:'AR',cat:'F',q:'Já tenho advogado mas o processo não anda. O que fazer?',tip:'Oriente sobre a possibilidade de acompanhar o processo, solicitar celeridade e, se necessário, trocar de representante legal.'},
+
+  // ── APOSENTADORIA ESPECIAL ──────────────────────────────────────
+  // Cat A — Quem Tem Direito
+  {n:301,area:'AE',cat:'A',q:'Trabalho em ambiente barulhento faz 20 anos. Isso me dá direito a aposentadoria especial?',tip:'Sim! A exposição a ruído acima dos limites legais é um dos principais agentes que gera direito à aposentadoria especial — com 25 anos de contribuição.'},
+  {n:302,area:'AE',cat:'A',q:'Trabalho numa fábrica com produtos químicos. Tenho direito à aposentadoria especial?',tip:'Explique os principais agentes químicos nocivos reconhecidos pelo INSS e a importância do Perfil Profissiográfico Previdenciário (PPP).'},
+  {n:303,area:'AE',cat:'A',q:'Sou enfermeira e trabalho com pacientes contagiosos. Isso conta para aposentadoria especial?',tip:'A exposição a agentes biológicos em hospitais e clínicas é reconhecida como atividade especial pelo INSS.'},
+  {n:304,area:'AE',cat:'A',q:'Trabalho como motorista de ônibus há 28 anos. Tenho direito à aposentadoria especial?',tip:'Aborde a exposição a vibração, ruído e agentes químicos do trânsito — atividade reconhecida como especial em vários períodos.'},
+  {n:305,area:'AE',cat:'A',q:'Sou soldador. Meu trabalho conta como atividade especial?',tip:'Soldagem envolve fumos metálicos, calor e ruído — tipicamente reconhecida como atividade especial.'},
+  {n:306,area:'AE',cat:'A',q:'Trabalho numa padaria perto do forno o dia todo. Isso é atividade especial?',tip:'A exposição a calor excessivo de forma habitual e permanente pode configurar atividade especial.'},
+  {n:307,area:'AE',cat:'A',q:'Sou técnico de raio-x. Tenho direito à aposentadoria especial?',tip:'A exposição a radiação ionizante (raios-x) é um dos agentes mais claros de reconhecimento de atividade especial.'},
+  {n:308,area:'AE',cat:'A',q:'Trabalho com agrotóxicos na lavoura. Isso me dá direito à aposentadoria especial?',tip:'A exposição habitual a agrotóxicos pode ser reconhecida como atividade especial com a documentação adequada.'},
+  {n:309,area:'AE',cat:'A',q:'Sou gari e fico no caminhão de lixo. Tenho direito à aposentadoria especial?',tip:'A atividade de coleta de lixo envolve agentes biológicos e químicos — pode ser reconhecida como especial dependendo do período e documentação.'},
+  // Cat B — Tempo de Contribuição e Carências
+  {n:310,area:'AE',cat:'B',q:'Quantos anos preciso trabalhar em condições especiais para me aposentar?',tip:'Explique os três prazos: 15 anos (agentes de maior risco), 20 anos e 25 anos, conforme o grau de nocividade.'},
+  {n:311,area:'AE',cat:'B',q:'Trabalhei 15 anos em atividade especial e 10 em atividade normal. Como fica minha aposentadoria?',tip:'Explique a possibilidade de converter o tempo especial em comum e como isso pode antecipar a aposentadoria por tempo de contribuição.'},
+  {n:312,area:'AE',cat:'B',q:'Trabalhei em condições especiais mas só por 12 anos. Posso aproveitar esse tempo?',tip:'O tempo em atividade especial pode ser convertido para tempo comum com fator multiplicador — não se perde.'},
+  {n:313,area:'AE',cat:'B',q:'Posso misturar períodos de atividade especial com períodos comuns para me aposentar?',tip:'Sim! A conversão de tempo especial em comum é permitida e pode ser estratégica para o planejamento previdenciário.'},
+  {n:314,area:'AE',cat:'B',q:'Trabalhei 30 anos em condições especiais. Por quanto tempo tenho direito à aposentadoria especial?',tip:'A aposentadoria especial não tem tempo mínimo após os requisitos — o benefício é permanente.'},
+  {n:315,area:'AE',cat:'B',q:'A Reforma da Previdência (2019) mudou a aposentadoria especial?',tip:'Aborde as mudanças pós-Reforma de 2019 — a aposentadoria especial passou a exigir também pontos mínimos para algumas categorias.'},
+  // Cat C — Documentos e PPP
+  {n:316,area:'AE',cat:'C',q:'O que é o PPP e por que ele é tão importante para aposentadoria especial?',tip:'Explique o Perfil Profissiográfico Previdenciário — documento obrigatório que descreve as condições de trabalho e os agentes nocivos aos quais o trabalhador foi exposto.'},
+  {n:317,area:'AE',cat:'C',q:'Minha empresa nunca emitiu o PPP. E agora?',tip:'A empresa é obrigada por lei a emitir o PPP. Se não emitir, pode ser responsabilizada — explique os caminhos para obter o documento.'},
+  {n:318,area:'AE',cat:'C',q:'A empresa fechou e não tenho o PPP. Perdi o direito à aposentadoria especial?',tip:'Existem alternativas como laudos técnicos históricos, análise de categoria profissional e ação judicial para reconhecimento das condições.'},
+  {n:319,area:'AE',cat:'C',q:'O LTCAT e o PCMSO são a mesma coisa do PPP?',tip:'Não — explique a diferença entre Laudo Técnico das Condições Ambientais (LTCAT), Programa de Controle Médico de Saúde Ocupacional (PCMSO) e o PPP.'},
+  {n:320,area:'AE',cat:'C',q:'Minha empresa diz que meu trabalho não é especial. Mas fico exposto a produto químico todo dia. O que faço?',tip:'O trabalhador pode questionar a classificação da atividade — explique o papel do sindicato e a possibilidade de laudo pericial particular.'},
+  {n:321,area:'AE',cat:'C',q:'Quais documentos devo juntar para pedir aposentadoria especial?',tip:'Liste os principais: PPP, CTPS, LTCAT, laudos médicos de exposição e, quando necessário, declarações de ex-empregadores.'},
+  {n:322,area:'AE',cat:'C',q:'O EPI (capacete, protetor auricular etc.) cancela o direito à aposentadoria especial?',tip:'Tema muito importante — após a Súmula 09 da TNU e posicionamento do STF, o uso de EPI eficaz pode afetar o reconhecimento da atividade especial para ruído.'},
+  // Cat D — Situações Especiais
+  {n:323,area:'AE',cat:'D',q:'Trabalho especial antes de 1995 conta para aposentadoria especial mesmo sem PPP?',tip:'Sim! Para períodos anteriores a 1995, o reconhecimento pode ser feito por categoria profissional ou por outros documentos — sem necessidade de PPP.'},
+  {n:324,area:'AE',cat:'D',q:'Trabalhei de forma especial entre 1995 e 2003. Qual documento preciso?',tip:'Para esse período, é necessário LTCAT ou laudo pericial da empresa. Explique as regras específicas de cada época.'},
+  {n:325,area:'AE',cat:'D',q:'Posso pedir a conversão do tempo especial sem me aposentar agora?',tip:'A conversão pode ser incluída no CNIS e usada futuramente. Explique a importância de registrar o tempo especial o quanto antes.'},
+  {n:326,area:'AE',cat:'D',q:'Sou servidor público. Tenho direito à aposentadoria especial?',tip:'Servidores públicos têm regras próprias de aposentadoria especial — o STF reconheceu o direito, mas cada regime tem suas particularidades.'},
+  {n:327,area:'AE',cat:'D',q:'Trabalho em mineração subterrânea. Quanto tempo de contribuição preciso?',tip:'Mineração subterrânea é um dos casos de 15 anos — uma das atividades de maior risco reconhecidas pelo INSS.'},
+  {n:328,area:'AE',cat:'D',q:'Sou professor e ouvi que tenho aposentadoria especial. É verdade?',tip:'A aposentadoria do professor tem regras próprias (não é "especial" no sentido técnico) — diferencia-se do regime de aposentadoria especial por agentes nocivos.'},
+  {n:329,area:'AE',cat:'D',q:'Trabalho em frigorífico no frio o dia inteiro. Isso é atividade especial?',tip:'A exposição habitual ao frio intenso é reconhecida como agente físico nocivo, podendo configurar atividade especial.'},
+  {n:330,area:'AE',cat:'D',q:'Meu marido trabalhava em atividade especial e faleceu. Tenho direito a algum benefício maior?',tip:'Encaminhe para o tema de Pensão por Morte, mas explique que o tempo especial do falecido pode ser considerado no cálculo da pensão.'},
+  {n:331,area:'AE',cat:'D',q:'Posso continuar trabalhando em atividade especial depois de me aposentar por esse motivo?',tip:'Não — a lei proíbe o exercício de atividade especial após a concessão da aposentadoria especial, sob pena de cancelamento.'},
+  // Cat E — Valores, Cálculo e Processos
+  {n:332,area:'AE',cat:'E',q:'Quanto vou receber de aposentadoria especial?',tip:'Após a Reforma de 2019, o cálculo segue a regra geral com base na média das contribuições — não há mais a integralidade automática.'},
+  {n:333,area:'AE',cat:'E',q:'A aposentadoria especial paga mais do que a aposentadoria normal?',tip:'Não necessariamente mais — a vantagem é a possibilidade de se aposentar antes (em menos anos de contribuição).'},
+  {n:334,area:'AE',cat:'E',q:'Consigo me aposentar pela atividade especial sem atingir a idade mínima?',tip:'Sim! Antes da Reforma de 2019, não havia idade mínima. Após 2019, há regras de transição. Explique as diferenças.'},
+  {n:335,area:'AE',cat:'E',q:'O INSS negou minha aposentadoria especial. Posso recorrer?',tip:'Sim! Recursos administrativos no CRPS e ação judicial são alternativas eficazes, especialmente com documentação adequada.'},
+  {n:336,area:'AE',cat:'E',q:'Posso receber os meses atrasados da aposentadoria especial que não pedi antes?',tip:'Sim — o INSS paga retroativamente desde a data do requerimento. Em ação judicial, pode ser desde a citação ou data do pedido administrativo.'},
+  {n:337,area:'AE',cat:'E',q:'Quanto tempo demora o pedido de aposentadoria especial no INSS?',tip:'O prazo legal é de 45 dias. Casos com documentação incompleta ou disputas sobre a caracterização especial tendem a demorar mais.'},
+  // Cat F — Planejamento Previdenciário
+  {n:338,area:'AE',cat:'F',q:'Como saber se a minha atividade é considerada especial pelo INSS?',tip:'Explique os Decretos que listam os agentes nocivos e como verificar no extrato do CNIS se o empregador registrou a atividade especial.'},
+  {n:339,area:'AE',cat:'F',q:'Vale a pena converter meu tempo especial em tempo comum para me aposentar mais rápido?',tip:'Depende — aborde o cálculo do fator de conversão (1,4 para 25 anos → comum; 1,2 para 20 anos; 1,67 para 15 anos).'},
+  {n:340,area:'AE',cat:'F',q:'Posso fazer planejamento previdenciário para aproveitar meu tempo especial da melhor forma?',tip:'Sim! O planejamento previdenciário pode definir qual modalidade de aposentadoria é mais vantajosa para cada situação.'},
+  {n:341,area:'AE',cat:'F',q:'Se eu sair da atividade especial agora, perco os anos que já trabalhei nessa condição?',tip:'Não — o tempo já trabalhado em atividade especial é um direito adquirido e pode ser convertido ou usado futuramente.'},
+  {n:342,area:'AE',cat:'F',q:'Devo pedir reconhecimento da atividade especial agora ou só quando for me aposentar?',tip:'O ideal é reconhecer e registrar o quanto antes — documentos de empresas podem se perder, principalmente se a empresa fechar.'},
+  {n:343,area:'AE',cat:'F',q:'O INSS tem como checar sozinho se minha atividade foi especial?',tip:'O INSS verifica o CNIS, mas a responsabilidade de informar a atividade especial é do empregador. O trabalhador deve conferir e cobrar.'},
+  {n:344,area:'AE',cat:'F',q:'Trabalho especial conta para o cálculo da aposentadoria por invalidez?',tip:'O tempo de atividade especial é incorporado ao tempo de contribuição e pode ser considerado em qualquer modalidade de aposentadoria.'},
+  {n:345,area:'AE',cat:'F',q:'Posso usar o tempo especial para me aposentar pelo INSS e continuar trabalhando em outra função?',tip:'Após a aposentadoria especial, o trabalho em atividade comum é permitido, mas o trabalho em atividade especial causa o cancelamento do benefício.'},
+  {n:346,area:'AE',cat:'F',q:'O advogado pode ajudar a conseguir meu PPP da empresa que fechou?',tip:'Sim — a ação judicial para reconhecimento de atividade especial pode ser movida mesmo sem o PPP, com outras provas documentais.'},
+  {n:347,area:'AE',cat:'F',q:'Estou prestes a me aposentar. Ainda dá tempo de incluir períodos especiais?',tip:'Sim, mas o processo de reconhecimento leva tempo. O ideal é agir o quanto antes para não atrasar a aposentadoria.'},
+  {n:348,area:'AE',cat:'F',q:'Onde encontro um advogado especialista em aposentadoria especial?',tip:'Encaminhe de forma ética — sugira que o usuário busque advogados especializados em direito previdenciário e verifique a OAB.'},
+
+  // ── AUXÍLIO ACIDENTE ────────────────────────────────────────────
+  // Cat A — O que é e Quem Tem Direito
+  {n:401,area:'AA',cat:'A',q:'Sofri um acidente e fiquei com sequela. O INSS me deu alta mas ainda sinto dor. Perdi o direito a algum benefício?',tip:'O Auxílio-Acidente é um benefício indenizatório pago após a alta médica, quando há sequela permanente que reduz a capacidade de trabalho.'},
+  {n:402,area:'AA',cat:'A',q:'O que é o auxílio-acidente? É diferente do auxílio-doença?',tip:'Sim — o auxílio-doença é temporário, pago durante o afastamento. O auxílio-acidente é permanente e pago mesmo voltando a trabalhar.'},
+  {n:403,area:'AA',cat:'A',q:'Sofri acidente de carro indo para o trabalho. Tenho direito ao auxílio-acidente?',tip:'Sim! Acidente de trajeto (in itinere) é equiparado ao acidente de trabalho para fins previdenciários.'},
+  {n:404,area:'AA',cat:'A',q:'Quebrei o braço no trabalho e fiquei com limitação. O INSS me deve alguma coisa além do afastamento?',tip:'Se houver sequela permanente que reduza a capacidade laboral, o trabalhador tem direito ao auxílio-acidente como indenização.'},
+  {n:405,area:'AA',cat:'A',q:'Caí em casa e fiquei com sequela. Tenho direito ao auxílio-acidente?',tip:'Sim! O auxílio-acidente não é exclusivo de acidentes de trabalho — qualquer acidente que cause sequela permanente pode gerar o direito.'},
+  {n:406,area:'AA',cat:'A',q:'Fui agredido e fiquei com limitação. Tenho direito ao auxílio-acidente?',tip:'Se a agressão gerou sequela permanente com redução da capacidade laboral, pode haver direito ao auxílio-acidente.'},
+  {n:407,area:'AA',cat:'A',q:'Trabalho de autônomo. Tenho direito ao auxílio-acidente se me machucar?',tip:'Sim, desde que seja contribuinte individual registrado no INSS. O autônomo tem os mesmos direitos ao auxílio-acidente.'},
+  {n:408,area:'AA',cat:'A',q:'Sou dona de casa e pago o INSS. Tenho direito ao auxílio-acidente?',tip:'Sim! A segurada facultativa (dona de casa) também tem direito ao auxílio-acidente em caso de sequela permanente por acidente.'},
+  {n:409,area:'AA',cat:'A',q:'O auxílio-acidente é para qualquer trabalhador ou só para quem tem carteira assinada?',tip:'O direito se estende a empregados, autônomos, MEIs e segurados facultativos — qualquer segurado do INSS.'},
+  // Cat B — Sequelas e Laudos Médicos
+  {n:410,area:'AA',cat:'B',q:'Que tipo de sequela dá direito ao auxílio-acidente?',tip:'Qualquer sequela permanente que reduza a capacidade funcional para o trabalho habitual — perda parcial de movimento, redução de força, dificuldade de locomoção, perda de audição parcial.'},
+  {n:411,area:'AA',cat:'B',q:'Minha lesão curou, mas tenho dor crônica. Isso conta como sequela para o INSS?',tip:'Dor crônica por lesão consolidada pode ser considerada sequela — depende de laudo médico que comprove o impacto na capacidade laborativa.'},
+  {n:412,area:'AA',cat:'B',q:'Fiz cirurgia depois do acidente. Ainda posso ter sequela para receber auxílio-acidente?',tip:'Sim — a cirurgia pode reduzir o dano, mas se restar limitação funcional, ainda há direito ao auxílio-acidente.'},
+  {n:413,area:'AA',cat:'B',q:'Perdi a audição parcialmente por trabalhar em lugar barulhento. Tenho direito ao auxílio-acidente?',tip:'PAIR (Perda Auditiva Induzida por Ruído) é uma das sequelas mais reconhecidas para concessão de auxílio-acidente.'},
+  {n:414,area:'AA',cat:'B',q:'Meu médico diz que estou curado, mas o INSS diz que tenho sequela. Quem está certo?',tip:'O perito do INSS tem avaliação autônoma. Em casos de divergência, é possível questionar o laudo com perícia médica particular.'},
+  {n:415,area:'AA',cat:'B',q:'O INSS pode me dar alta do auxílio-doença e negar o auxílio-acidente ao mesmo tempo?',tip:'Sim, mas isso pode ser contestado — o benefício de auxílio-acidente deve ser concedido automaticamente ao receber alta com sequela confirmada.'},
+  // Cat C — Valor e Cálculo do Benefício
+  {n:416,area:'AA',cat:'C',q:'Quanto recebo de auxílio-acidente?',tip:'O auxílio-acidente corresponde a 50% do salário de benefício que serviu de base para o cálculo do auxílio-doença. Não é o salário integral.'},
+  {n:417,area:'AA',cat:'C',q:'Recebi auxílio-doença por 6 meses. O auxílio-acidente vai ser calculado com base no meu salário?',tip:'Sim — a base é o salário de benefício (média das contribuições), não o salário bruto da carteira de trabalho.'},
+  {n:418,area:'AA',cat:'C',q:'O auxílio-acidente tem data de fim ou é para sempre?',tip:'O auxílio-acidente é vitalício — dura enquanto a sequela persistir. Cessa apenas com aposentadoria ou óbito do beneficiário.'},
+  {n:419,area:'AA',cat:'C',q:'Posso receber auxílio-acidente e continuar trabalhando?',tip:'Sim! Diferente do auxílio-doença, o auxílio-acidente é compatível com o exercício de qualquer atividade remunerada.'},
+  {n:420,area:'AA',cat:'C',q:'O auxílio-acidente é somado ao meu salário?',tip:'Sim — o benefício é pago junto ao salário mensal, funcionando como indenização adicional pelo prejuízo à capacidade de trabalho.'},
+  {n:421,area:'AA',cat:'C',q:'O auxílio-acidente é reajustado todo ano?',tip:'Sim, o benefício é reajustado anualmente pelo mesmo índice usado pelo INSS para aposentadorias e pensões.'},
+  {n:422,area:'AA',cat:'C',q:'Posso receber auxílio-acidente e auxílio-doença ao mesmo tempo?',tip:'Não — não é possível acumular os dois. O auxílio-acidente começa quando o auxílio-doença termina (na alta médica).'},
+  // Cat D — Processos no INSS e Negativas
+  {n:423,area:'AA',cat:'D',q:'O INSS me deu alta do auxílio-doença mas não concedeu auxílio-acidente. O que faço?',tip:'É possível contestar a alta e requerer o auxílio-acidente. Explique o caminho: pedido administrativo e/ou ação judicial.'},
+  {n:424,area:'AA',cat:'D',q:'O INSS negou meu auxílio-acidente. Posso recorrer?',tip:'Sim — recurso no Conselho de Recursos da Previdência Social (CRPS) ou ação judicial nos Juizados Especiais Federais (JEFs).'},
+  {n:425,area:'AA',cat:'D',q:'Quanto tempo o INSS tem para analisar meu pedido de auxílio-acidente?',tip:'O prazo legal é de 45 dias. Em caso de descumprimento, é possível ingressar com ação de obrigação de fazer.'},
+  {n:426,area:'AA',cat:'D',q:'O INSS pode cancelar o auxílio-acidente depois de concedido?',tip:'Pode, em caso de revisão que constate que os requisitos não eram devidos. Por isso, a documentação correta desde o início é essencial.'},
+  {n:427,area:'AA',cat:'D',q:'Posso pedir auxílio-acidente anos depois de ter tido o acidente?',tip:'Sim, mas há prazo de prescrição de 5 anos a partir da data em que o benefício deveria ter sido concedido.'},
+  {n:428,area:'AA',cat:'D',q:'Perdi os documentos do acidente. Consigo provar para o INSS mesmo assim?',tip:'Boletim de ocorrência, prontuário médico e CAT (Comunicação de Acidente de Trabalho) são os principais — oriente como obtê-los.'},
+  {n:429,area:'AA',cat:'D',q:'A empresa não emitiu a CAT do meu acidente. Isso impede meu auxílio-acidente?',tip:'A falta da CAT não impede o benefício — o trabalhador pode emitir a CAT diretamente, ou o sindicato, médico ou autoridade pública.'},
+  // Cat E — Acúmulo com Outros Benefícios
+  {n:430,area:'AA',cat:'E',q:'Posso receber auxílio-acidente e aposentadoria ao mesmo tempo?',tip:'Não — a aposentadoria cancela o auxílio-acidente. Porém, o tempo em que recebeu o benefício pode ser considerado para o cálculo da aposentadoria.'},
+  {n:431,area:'AA',cat:'E',q:'Posso acumular auxílio-acidente com pensão por morte?',tip:'Sim! Auxílio-acidente e pensão por morte são acumuláveis — têm fatos geradores distintos.'},
+  {n:432,area:'AA',cat:'E',q:'Tenho auxílio-acidente. Isso vai me prejudicar quando for me aposentar?',tip:'Não prejudica — o auxílio-acidente cessa com a aposentadoria, mas há regra que garante que seu valor seja incorporado parcialmente ao cálculo.'},
+  {n:433,area:'AA',cat:'E',q:'Posso receber auxílio-acidente e BPC ao mesmo tempo?',tip:'Não — BPC e qualquer benefício previdenciário são incompatíveis por força de lei.'},
+  {n:434,area:'AA',cat:'E',q:'Recebo auxílio-doença agora. Quando vou para o auxílio-acidente?',tip:'O auxílio-acidente vem após a alta do auxílio-doença, quando o médico perito do INSS constata que há sequela permanente com redução da capacidade laborativa.'},
+  {n:435,area:'AA',cat:'E',q:'Recebi indenização da empresa pelo acidente. Isso cancela o auxílio-acidente?',tip:'Não — a indenização civil (paga pela empresa ou seguro) e o auxílio-acidente (pago pelo INSS) são independentes e acumuláveis.'},
+  // Cat F — Acidente de Trabalho e CAT
+  {n:436,area:'AA',cat:'F',q:'O que é a CAT e por que ela é tão importante?',tip:'A Comunicação de Acidente de Trabalho (CAT) é o documento que registra o acidente e inicia o vínculo com a Previdência Social.'},
+  {n:437,area:'AA',cat:'F',q:'Sofri acidente de trabalho mas a empresa se recusa a emitir a CAT. O que faço?',tip:'O trabalhador, sindicato, médico, autoridade pública ou advogado pode emitir a CAT diretamente. A empresa não tem poder de impedir o benefício.'},
+  {n:438,area:'AA',cat:'F',q:'Acidente no trajeto para o trabalho conta como acidente de trabalho?',tip:'Sim — o acidente de trajeto (in itinere) é equiparado ao acidente de trabalho pela lei brasileira.'},
+  {n:439,area:'AA',cat:'F',q:'Doença causada pelo trabalho dá direito ao auxílio-acidente?',tip:'A doença ocupacional (causada pelo trabalho) é equiparada ao acidente de trabalho e pode gerar direito ao auxílio-acidente se deixar sequela permanente.'},
+  {n:440,area:'AA',cat:'F',q:'Trabalhava em obras e fui ferido por material. Tenho direito ao auxílio-acidente?',tip:'Acidente típico de trabalho na construção civil é um dos casos mais frequentes de auxílio-acidente — a sequela é o que define o direito.'},
+  {n:441,area:'AA',cat:'F',q:'Meu chefe disse que foi culpa minha o acidente. Isso cancela meu direito ao auxílio-acidente?',tip:'Não — o auxílio-acidente é um benefício previdenciário, não depende de culpa. A responsabilidade civil é questão separada.'},
+  {n:442,area:'AA',cat:'F',q:'Sofri acidente durante a pandemia trabalhando em home office. Tenho direito?',tip:'Acidente em home office pode ser reconhecido como acidente de trabalho, mas a comprovação é mais complexa — tema que vale vídeo específico.'},
+  // Cat G — Dicas Finais e Planejamento
+  {n:443,area:'AA',cat:'G',q:'Devo contratar advogado para pedir o auxílio-acidente ou posso fazer sozinho?',tip:'O pedido pode ser feito no Meu INSS, mas diante de sequelas não evidentes ou negativas anteriores, o advogado especialista faz grande diferença.'},
+  {n:444,area:'AA',cat:'G',q:'Vale a pena entrar na Justiça pelo auxílio-acidente?',tip:'Sim, quando o INSS nega ou subestima a sequela — os JEFs são gratuitos para quem não pode pagar custas e têm processo simplificado.'},
+  {n:445,area:'AA',cat:'G',q:'Quanto tempo dura um processo de auxílio-acidente na Justiça?',tip:'Nos JEFs, o processo tende a ser mais ágil (1 a 3 anos em média). A tutela antecipada pode antecipar o pagamento.'},
+  {n:446,area:'AA',cat:'G',q:'O juiz pode determinar perícia médica diferente da do INSS?',tip:'Sim — na ação judicial, o juiz nomeia um perito independente, cujo laudo pode diferir completamente do laudo do perito do INSS.'},
+  {n:447,area:'AA',cat:'G',q:'Posso pedir o auxílio-acidente e o seguro de acidente pessoal ao mesmo tempo?',tip:'Sim — o seguro privado de acidente e o auxílio-acidente do INSS são benefícios independentes e acumuláveis.'},
+  {n:448,area:'AA',cat:'G',q:'Existe limite de renda para receber auxílio-acidente?',tip:'Não — o auxílio-acidente não tem limite de renda. Qualquer segurado do INSS com sequela permanente tem direito, independentemente do salário.'},
+
+  // ── PENSÃO POR MORTE ────────────────────────────────────────────
+  // Cat A — Quem Tem Direito
+  {n:501,area:'PM',cat:'A',q:'Meu marido faleceu e eu sei que ele pagava o INSS. Tenho direito à pensão?',tip:'Explique os requisitos: o falecido precisa ter qualidade de segurado no momento da morte e o cônjuge/companheiro ser dependente presumido.'},
+  {n:502,area:'PM',cat:'A',q:'Minha mãe faleceu e dependia financeiramente de mim. Tenho direito à pensão por morte?',tip:'Os pais dependentes econômicos do segurado têm direito à pensão em casos específicos — explique a hierarquia de dependentes do INSS.'},
+  {n:503,area:'PM',cat:'A',q:'Meu pai nunca foi casado com minha mãe mas sempre contribuiu ao INSS. Tenho direito à pensão?',tip:'Filhos de qualquer natureza (dentro ou fora do casamento) têm direito à pensão por morte até os 21 anos (ou enquanto inválidos).'},
+  {n:504,area:'PM',cat:'A',q:'Vivia com meu companheiro há 10 anos sem casar. Tenho direito à pensão por morte?',tip:'A união estável é reconhecida pelo INSS para fins de pensão — mas é preciso provar a convivência com documentação.'},
+  {n:505,area:'PM',cat:'A',q:'Fui casada por 2 meses antes do meu marido falecer. Tenho direito à pensão por morte?',tip:'Após a Reforma de 2019, há regras de proporcionalidade para casamentos/uniões recentes — o tema merece vídeo dedicado.'},
+  {n:506,area:'PM',cat:'A',q:'Estávamos separados mas não divorciados quando ele morreu. Tenho direito à pensão?',tip:'A separação de fato sem divórcio pode manter o direito à pensão se houver dependência econômica comprovada — análise caso a caso.'},
+  {n:507,area:'PM',cat:'A',q:'Meu filho tem 22 anos e é universitário. Tem direito à pensão por morte do pai?',tip:'A pensão por morte para filhos cessa aos 21 anos, independente de ser universitário — diferente do direito civil alimentar.'},
+  {n:508,area:'PM',cat:'A',q:'Meu filho é portador de deficiência e não trabalha. Tem direito à pensão por morte do pai para sempre?',tip:'Sim! Filhos inválidos ou com deficiência grave têm direito à pensão por morte de forma vitalícia, sem limitação de idade.'},
+  {n:509,area:'PM',cat:'A',q:'Estávamos noivos quando ele faleceu. Tenho direito à pensão por morte?',tip:'O noivado sem convivência estável documentada não gera direito à pensão — é necessário provar a união estável de fato.'},
+  // Cat B — Valor e Cálculo da Pensão
+  {n:510,area:'PM',cat:'B',q:'Quanto vou receber de pensão por morte do meu marido?',tip:'Após a Reforma de 2019, a pensão corresponde a 50% + 10% por dependente adicional — explique as faixas com exemplos práticos.'},
+  {n:511,area:'PM',cat:'B',q:'A pensão por morte é igual ao salário que ele recebia?',tip:'Não — é calculada com base no salário de benefício (média das contribuições ao INSS), não no salário bruto. Pode ser menor.'},
+  {n:512,area:'PM',cat:'B',q:'A pensão por morte tem valor mínimo?',tip:'Sim — o valor mínimo é de 1 salário mínimo quando o falecido contribuía no mínimo sobre esse valor.'},
+  {n:513,area:'PM',cat:'B',q:'Se meu marido recebia auxílio-doença quando morreu, minha pensão vai ser calculada com base nisso?',tip:'A pensão é calculada com base no benefício que o segurado recebia ou que teria direito a receber. Explique a regra de forma simples.'},
+  {n:514,area:'PM',cat:'B',q:'A pensão por morte tem data de fim ou é para sempre?',tip:'Após a Reforma de 2019, há prazo de duração proporcional ao tempo de contribuição do falecido e à idade do pensionista.'},
+  {n:515,area:'PM',cat:'B',q:'Se eu me casar de novo, perco a pensão por morte?',tip:'Após a Reforma de 2019, o casamento ou nova união estável cancela a pensão por morte. Explique essa mudança importante.'},
+  // Cat C — Documentos e Processo no INSS
+  {n:516,area:'PM',cat:'C',q:'Quais documentos preciso para pedir pensão por morte?',tip:'Liste os principais: certidão de óbito, documentos do falecido (CPF, CTPS), documentos do dependente, prova de vínculo (certidão de casamento, comprovante de união estável, certidão de nascimento dos filhos).'},
+  {n:517,area:'PM',cat:'C',q:'Como comprovar união estável para o INSS depois do falecimento?',tip:'Contas conjuntas, contas de luz/água no endereço comum, fotos, declarações de testemunhas, escritura pública de união estável — quanto mais provas, melhor.'},
+  {n:518,area:'PM',cat:'C',q:'O INSS negou minha pensão por morte. E agora?',tip:'Recurso no CRPS ou ação judicial são os caminhos. Explique que a negativa não é definitiva.'},
+  {n:519,area:'PM',cat:'C',q:'Quanto tempo o INSS demora para aprovar a pensão por morte?',tip:'O prazo legal é de 45 dias. Em casos complexos (união estável não documentada, conflitos entre dependentes), pode demorar mais.'},
+  {n:520,area:'PM',cat:'C',q:'Posso pedir pensão por morte pela internet?',tip:'Sim — pelo portal Meu INSS o pedido pode ser feito digitalmente, com envio de documentos pelo app.'},
+  {n:521,area:'PM',cat:'C',q:'Tenho prazo para pedir pensão por morte ou posso perder esse direito?',tip:'O prazo de prescrição é de 5 anos a partir da data do óbito. Mas o pagamento retroativo só ocorre a partir do requerimento.'},
+  {n:522,area:'PM',cat:'C',q:'Posso pedir pensão por morte anos depois do falecimento?',tip:'Sim — dentro do prazo de 5 anos. Mas o INSS pagará retroativamente apenas a partir da data do pedido, não do óbito.'},
+  // Cat D — Situações Especiais
+  {n:523,area:'PM',cat:'D',q:'Meu marido havia parado de pagar o INSS há 6 meses quando morreu. Tenho direito à pensão?',tip:'O "período de graça" mantém a qualidade de segurado por até 12 meses após o último pagamento — em muitos casos, o direito é mantido.'},
+  {n:524,area:'PM',cat:'D',q:'Meu filho faleceu e era eu quem dependia dele. Tenho direito à pensão por morte?',tip:'Pais que dependiam economicamente do filho segurado têm direito à pensão por morte, mas precisam provar a dependência.'},
+  {n:525,area:'PM',cat:'D',q:'Minha neta morava comigo e eu sustentava ela. O pai dela morreu. Ela tem direito à pensão?',tip:'Filhos menores são dependentes preferenciais — a neta não teria direito direto, mas a mãe/tutora legal pode requerer em nome dela.'},
+  {n:526,area:'PM',cat:'D',q:'O falecido tinha duas famílias. Como fica a divisão da pensão?',tip:'Cônjuge e companheira (em casos específicos) podem dividir a pensão — tema complexo e frequente nas redes sociais.'},
+  {n:527,area:'PM',cat:'D',q:'Meu marido era funcionário público federal. A pensão é pelo INSS ou pelo governo?',tip:'Servidores públicos federais têm regime próprio de previdência (RPPS) — não é pelo INSS. As regras são diferentes.'},
+  {n:528,area:'PM',cat:'D',q:'O falecido nunca contribuiu ao INSS. Minha família não tem direito a nada?',tip:'Sem contribuição ao INSS, não há direito à pensão previdenciária. Explique o BPC como alternativa para famílias de baixa renda.'},
+  {n:529,area:'PM',cat:'D',q:'Meu companheiro contribuía ao INSS como autônomo. Tenho direito à pensão?',tip:'Sim — desde que ele estivesse com as contribuições em dia (qualidade de segurado) no momento do falecimento.'},
+  {n:530,area:'PM',cat:'D',q:'Trabalhador rural que faleceu. A família tem direito à pensão por morte?',tip:'O Segurado Especial (trabalhador rural) também gera direito à pensão por morte para seus dependentes — valor é de 1 salário mínimo.'},
+  {n:531,area:'PM',cat:'D',q:'Meu marido faleceu por acidente de trabalho. A pensão é maior?',tip:'Em caso de acidente de trabalho, não há exigência de carência mínima para a pensão — ela é concedida independentemente do tempo de contribuição.'},
+  // Cat E — Acúmulo com Outros Benefícios
+  {n:532,area:'PM',cat:'E',q:'Posso receber pensão por morte e aposentadoria ao mesmo tempo?',tip:'Depende — após a Reforma de 2019, há limitações ao acúmulo de benefícios do INSS. Explique as regras atuais de forma acessível.'},
+  {n:533,area:'PM',cat:'E',q:'Recebo salário-maternidade. Posso receber pensão por morte também?',tip:'Sim — os dois são acumuláveis, pois têm fatos geradores distintos.'},
+  {n:534,area:'PM',cat:'E',q:'Recebo Bolsa Família. Tenho direito à pensão por morte também?',tip:'O Bolsa Família é cancelado quando há concessão de pensão por morte pelo INSS — porque o benefício previdenciário pode superar os limites de renda do programa.'},
+  {n:535,area:'PM',cat:'E',q:'Posso receber pensão por morte e auxílio-acidente ao mesmo tempo?',tip:'Sim — se o próprio dependente for segurado do INSS e tiver auxílio-acidente, os dois benefícios são acumuláveis.'},
+  {n:536,area:'PM',cat:'E',q:'Minha mãe recebe BPC. Com a morte do meu pai, ela pode trocar para pensão por morte?',tip:'BPC e pensão por morte não se acumulam, mas pode ser vantajoso fazer a troca se o valor da pensão for maior. Precisa de análise caso a caso.'},
+  {n:537,area:'PM',cat:'E',q:'Posso receber pensão por morte do ex-marido mesmo tendo me divorciado?',tip:'Divorciado não tem direito à pensão como ex-cônjuge — a menos que recebesse alimentos ou seja dependente econômico comprovado.'},
+  // Cat F — Reforma da Previdência e Mudanças Recentes
+  {n:538,area:'PM',cat:'F',q:'A Reforma da Previdência de 2019 mudou a pensão por morte?',tip:'Sim — mudou o percentual (agora 50% + 10% por dependente), o prazo de duração (proporcional ao tempo de contribuição) e as regras de acúmulo.'},
+  {n:539,area:'PM',cat:'F',q:'Meu marido faleceu antes da Reforma de 2019. Tenho direito às regras antigas?',tip:'Sim — o direito é adquirido pela regra vigente na data do óbito. Quem faleceu antes de novembro de 2019 tem as regras antigas.'},
+  {n:540,area:'PM',cat:'F',q:'A pensão por morte pode acabar antes de eu morrer?',tip:'Sim — após a Reforma de 2019, a duração da pensão é proporcional ao tempo de contribuição do falecido e pode ter prazo determinado.'},
+  {n:541,area:'PM',cat:'F',q:'Quanto tempo dura a pensão por morte hoje em dia?',tip:'Depende do tempo de contribuição do falecido: menos de 18 contribuições = 3 anos; mais de 18 = até vitalício para maiores de 44 anos.'},
+  {n:542,area:'PM',cat:'F',q:'A pensão vitalícia ainda existe ou acabou com a Reforma?',tip:'Ainda existe para quem tiver mais de 44 anos no momento do óbito e o falecido tiver cumprido os requisitos de contribuição.'},
+  // Cat G — Conflitos e Casos Complexos
+  {n:543,area:'PM',cat:'G',q:'Meu marido estava separado quando morreu. A ex-esposa pode pegar a pensão da minha parte?',tip:'Se havia dependência econômica comprovada da ex-cônjuge, a pensão pode ser dividida. É um dos temas mais polêmicos e frequentes.'},
+  {n:544,area:'PM',cat:'G',q:'Vários filhos de mães diferentes. Como fica a divisão da pensão?',tip:'Todos os filhos reconhecidos têm direito igual à pensão, dividida em partes iguais entre os dependentes da mesma classe.'},
+  {n:545,area:'PM',cat:'G',q:'O INSS está pagando a pensão para outra pessoa. O que faço?',tip:'É possível contestar e incluir novos dependentes — o INSS deve fazer a revisão e redistribuição do benefício entre os dependentes legítimos.'},
+  {n:546,area:'PM',cat:'G',q:'Meu marido tinha dívidas quando morreu. O INSS vai descontar da minha pensão?',tip:'Dívidas do falecido não são descontadas da pensão por morte — é um benefício de natureza alimentar, protegido por lei.'},
+  {n:547,area:'PM',cat:'G',q:'A empresa onde meu marido trabalhava tem alguma obrigação de pagar algo além do INSS?',tip:'Encaminhe para os direitos trabalhistas (FGTS, rescisão) e para a eventual indenização civil por acidente de trabalho.'},
+  {n:548,area:'PM',cat:'G',q:'Posso entrar na Justiça para pedir pensão por morte que o INSS negou?',tip:'Sim — ação judicial nos JEFs é o caminho mais comum e eficiente quando o INSS nega indevidamente a pensão por morte.'},
+];
+
+// Category labels by area
+const CAT_LABELS_SM  = {A:'Trabalho',B:'Prazos',C:'Carência',D:'Família',E:'Acúmulo',F:'Processo'};
+const CAT_LABELS_BPC = {A:'O que é / Direito',B:'Renda Familiar',C:'Laudos / Docs',D:'Negativa',E:'Processo',F:'Acúmulo',G:'Situações Especiais'};
+const CAT_LABELS_AR  = {A:'Quem tem Direito',B:'Idade e Tempo',C:'Documentos/Processo',D:'Situações Especiais',E:'Valores e Cálculo',F:'Negativas/Recursos'};
+const CAT_LABELS_AE  = {A:'Quem Tem Direito',B:'Tempo de Contribuição',C:'Documentos / PPP',D:'Situações Especiais',E:'Valores e Processos',F:'Planejamento'};
+const CAT_LABELS_AA  = {A:'O que é / Direito',B:'Sequelas e Laudos',C:'Valor e Cálculo',D:'INSS e Negativas',E:'Acúmulo',F:'Acidente de Trabalho',G:'Dicas e Planejamento'};
+const CAT_LABELS_PM  = {A:'Quem Tem Direito',B:'Valor e Cálculo',C:'Documentos/Processo',D:'Situações Especiais',E:'Acúmulo',F:'Reforma 2019',G:'Conflitos e Casos'};
+const CAT_CLASS = {A:'cat-a',B:'cat-b',C:'cat-c',D:'cat-d',E:'cat-e',F:'cat-f',G:'cat-g'};
+const AREA_LABELS = {SM:'Salário Maternidade', BPC:'BPC Autismo', AR:'Aposen. Rural', AE:'Aposen. Especial', AA:'Auxílio Acidente', PM:'Pensão por Morte'};
+const CAT_LABELS_MAP = {SM:CAT_LABELS_SM, BPC:CAT_LABELS_BPC, AR:CAT_LABELS_AR, AE:CAT_LABELS_AE, AA:CAT_LABELS_AA, PM:CAT_LABELS_PM};
+
+function getCatLabel(area, cat) {
+  return (CAT_LABELS_MAP[area] || {})[cat] || cat;
+}
+function getCatLabels(area) {
+  if (CAT_LABELS_MAP[area]) return CAT_LABELS_MAP[area];
+  // all combined
+  const merged = {};
+  Object.values(CAT_LABELS_MAP).forEach(m => Object.assign(merged, m));
+  return merged;
+}
+
+/* ═══════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════ */
+let posts = {};           // { 'YYYY-MM-DD': [ postObj ] }
+let curYear, curMonth;
+let selectedTheme = null;
+let activeDayKey = null;  // which day detail is open
+let addedThemes   = new Set();
+let selArea = 'todos';
+let selCat  = 'todos';
+
+(function() {
+  const now = new Date();
+  curYear  = now.getFullYear();
+  curMonth = now.getMonth();
+})();
+
+/* ═══════════════════════════════════════════════
+   TABS
+═══════════════════════════════════════════════ */
+const TAB_IDS = ['calendario','banco','roteiros','impulsionar','insights','tendencias'];
+function switchTab(id) {
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', TAB_IDS[i] === id));
+  document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + id));
+}
+
+/* ═══════════════════════════════════════════════
+   CALENDAR
+═══════════════════════════════════════════════ */
+const MONTHS = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
+function buildYearSel() {
+  const s = document.getElementById('cal-year-sel');
+  s.innerHTML = '';
+  for (let y = 2024; y <= 2033; y++) {
+    const o = document.createElement('option');
+    o.value = y; o.textContent = y;
+    if (y === curYear) o.selected = true;
+    s.appendChild(o);
+  }
+}
+
+function renderCalendar() {
+  document.getElementById('cal-month-label').textContent = MONTHS[curMonth];
+  buildYearSel();
+  const grid   = document.getElementById('cal-grid');
+  const labels = Array.from(grid.querySelectorAll('.cal-day-label'));
+  grid.innerHTML = '';
+  labels.forEach(l => grid.appendChild(l));
+
+  const first = new Date(curYear, curMonth, 1).getDay();
+  const days  = new Date(curYear, curMonth + 1, 0).getDate();
+  const today = new Date();
+
+  for (let i = 0; i < first; i++) {
+    const e = document.createElement('div');
+    e.className = 'cal-day empty';
+    grid.appendChild(e);
+  }
+
+  for (let d = 1; d <= days; d++) {
+    const key = `${curYear}-${String(curMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const div = document.createElement('div');
+    const isToday = today.getFullYear()===curYear && today.getMonth()===curMonth && today.getDate()===d;
+    div.className = 'cal-day' + (isToday ? ' today' : '');
+    div.onclick = () => openDayModal(key);
+
+    const dayPosts = posts[key] || [];
+    const countEl = dayPosts.length > 0 ? `<span class="cal-post-count">${dayPosts.length}</span>` : '';
+    div.innerHTML = `<div class="cal-day-num"><span>${d}</span>${countEl}</div>`;
+
+    // Show up to 3 posts in cell
+    dayPosts.slice(0, 3).forEach(p => {
+      const tag = document.createElement('div');
+      tag.className = 'cal-post-tag ' + CAT_CLASS[p.cat] + (p.done ? ' done-post' : '');
+      tag.innerHTML = `<span class="post-time-dot">${p.time || ''}</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.done ? '✅ ' : ''}${p.q.substring(0,22)}…</span>`;
+      tag.title = p.q;
+      div.appendChild(tag);
+    });
+    if (dayPosts.length > 3) {
+      const more = document.createElement('div');
+      more.style.cssText = 'font-size:.58rem;color:var(--text-dim);padding:1px 4px';
+      more.textContent = `+${dayPosts.length - 3} mais`;
+      div.appendChild(more);
+    }
+
+    grid.appendChild(div);
+  }
+}
+
+function changeMonth(d) {
+  curMonth += d;
+  if (curMonth > 11) { curMonth = 0; curYear++; }
+  if (curMonth < 0)  { curMonth = 11; curYear--; }
+  renderCalendar();
+}
+function changeYear(y) { curYear = parseInt(y); renderCalendar(); }
+function goToday() {
+  const now = new Date();
+  curYear = now.getFullYear(); curMonth = now.getMonth();
+  renderCalendar();
+}
+
+/* ═══════════════════════════════════════════════
+   DAY DETAIL MODAL
+═══════════════════════════════════════════════ */
+function openDayModal(key) {
+  activeDayKey = key;
+  const [y, m, d] = key.split('-');
+  document.getElementById('day-modal-title').textContent =
+    `${parseInt(d)} de ${MONTHS[parseInt(m)-1]} de ${y}`;
+  renderDayPosts(key);
+  document.getElementById('day-modal-bg').classList.add('open');
+}
+
+function closeDayModal() {
+  document.getElementById('day-modal-bg').classList.remove('open');
+  activeDayKey = null;
+}
+
+function renderDayPosts(key) {
+  const list = document.getElementById('day-post-list');
+  list.innerHTML = '';
+  const dayPosts = posts[key] || [];
+  if (dayPosts.length === 0) {
+    list.innerHTML = '<div class="day-empty-msg">Nenhum post agendado para este dia.</div>';
+    return;
+  }
+  // Sort by time
+  const sorted = [...dayPosts].sort((a,b) => (a.time||'').localeCompare(b.time||''));
+  const now = new Date();
+
+  sorted.forEach(p => {
+    // Check if post is overdue (date+time < now and not done)
+    let isOverdue = false;
+    if (!p.done && p.time) {
+      const postDt = new Date(`${key}T${p.time}:00`);
+      isOverdue = postDt < now;
+    }
+
+    const item = document.createElement('div');
+    item.className = 'day-post-item' + (p.done ? ' is-done' : '') + (isOverdue && !p.done ? ' is-overdue' : '');
+
+    const areaLabel = AREA_LABELS[p.area] || p.area;
+    const catLabel  = getCatLabel(p.area, p.cat);
+    const tipoLabel = p.tipo || 'reels';
+    const overdueNote = isOverdue && !p.done ? '<span style="font-size:.6rem;color:#EF9F27;margin-left:4px">⚠ Horário passado</span>' : '';
+
+    item.innerHTML = `
+      <div class="dpi-main">
+        <div class="dpi-meta">
+          ${p.time ? `<span class="dpi-time">🕐 ${p.time}</span>` : ''}
+          <span class="dpi-area">${areaLabel}</span>
+          <span class="dpi-cat ${CAT_CLASS[p.cat]}">${p.cat} · ${catLabel}</span>
+          <span class="dpi-type">${tipoLabel}</span>
+          ${overdueNote}
+        </div>
+        <div class="dpi-q">${p.q}</div>
+      </div>
+      <div class="dpi-actions">
+        <button class="btn-done ${p.done ? 'done-btn' : 'pending'}"
+          onclick="toggleDone('${key}','${p.id}')">
+          ${p.done ? '✅ Feito' : '○ Pendente'}
+        </button>
+        <button class="btn-delete" onclick="deletePost('${key}','${p.id}')">🗑 Remover</button>
+      </div>`;
+    list.appendChild(item);
+  });
+}
+
+function toggleDone(key, id) {
+  const p = (posts[key] || []).find(x => x.id === id);
+  if (p) { p.done = !p.done; renderDayPosts(key); renderCalendar(); }
+}
+
+function deletePost(key, id) {
+  if (!posts[key]) return;
+  const p = posts[key].find(x => x.id === id);
+  if (p) addedThemes.delete(p.n);
+  posts[key] = posts[key].filter(x => x.id !== id);
+  if (posts[key].length === 0) delete posts[key];
+  renderDayPosts(key);
+  renderCalendar();
+  renderThemes(selArea, selCat);
+}
+
+function openAddFromDay() {
+  // Keep day modal open context; open add modal pre-filled with the active date
+  document.getElementById('modal-data').value = activeDayKey || '';
+  document.getElementById('modal-hora').value = '18:00';
+  selectedTheme = null;
+  document.getElementById('modal-tema').textContent = 'Nenhum tema selecionado. Volte ao Banco de Temas para escolher um tema e clicar em "+ Agendar".';
+  closeDayModal();
+  // Don't open add modal without a theme — just switch to banco
+  switchTab('banco');
+}
+
+/* ═══════════════════════════════════════════════
+   ADD MODAL (from Banco de Temas)
+═══════════════════════════════════════════════ */
+function openAddModal(n) {
+  selectedTheme = TEMAS.find(t => t.n === n);
+  document.getElementById('modal-tema').textContent = selectedTheme.q;
+  const d = new Date(); d.setDate(d.getDate() + 1);
+  if (!document.getElementById('modal-data').value) {
+    document.getElementById('modal-data').value = d.toISOString().split('T')[0];
+  }
+  document.getElementById('add-modal-bg').classList.add('open');
+}
+
+function closeAddModal() {
+  document.getElementById('add-modal-bg').classList.remove('open');
+}
+
+function confirmAdd() {
+  const data = document.getElementById('modal-data').value;
+  const hora = document.getElementById('modal-hora').value || '';
+  const tipo = document.getElementById('modal-tipo').value;
+  if (!data || !selectedTheme) return;
+  if (!posts[data]) posts[data] = [];
+  posts[data].push({
+    id:   Date.now() + '-' + Math.random().toString(36).substr(2,5),
+    n:    selectedTheme.n,
+    area: selectedTheme.area,
+    cat:  selectedTheme.cat,
+    q:    selectedTheme.q,
+    time: hora,
+    tipo: tipo,
+    done: false
+  });
+  addedThemes.add(selectedTheme.n);
+  closeAddModal();
+  renderCalendar();
+  renderThemes(selArea, selCat);
+  switchTab('calendario');
+}
+
+/* Close modals on backdrop click */
+document.getElementById('day-modal-bg').addEventListener('click', e => { if(e.target===document.getElementById('day-modal-bg')) closeDayModal(); });
+document.getElementById('add-modal-bg').addEventListener('click', e => { if(e.target===document.getElementById('add-modal-bg')) closeAddModal(); });
+
+/* ═══════════════════════════════════════════════
+   BANCO DE TEMAS  ── two-level filter
+═══════════════════════════════════════════════ */
+function filterArea(area) {
+  selArea = area;
+  selCat  = 'todos';
+  // Update area filter buttons (skip .future)
+  document.querySelectorAll('#area-filters .filter-btn:not(.future)').forEach(b => {
+    const isAll = b.textContent.trim() === 'Todos';
+    b.classList.toggle('active', area === 'todos' ? isAll : b.onclick.toString().includes(`'${area}'`));
+  });
+  // Re-check by data attribute — simpler approach: compare onclick text
+  document.querySelectorAll('#area-filters .filter-btn:not(.future)').forEach(b => {
+    const txt = b.getAttribute('onclick') || '';
+    const match = area === 'todos' ? txt.includes("'todos'") : txt.includes(`'${area}'`);
+    b.classList.toggle('active', match);
+  });
+  buildCatFilters(area);
+  renderThemes(area, 'todos');
+  // Update subtitle
+  const total = TEMAS.filter(t => area === 'todos' || t.area === area).length;
+  document.getElementById('banco-sub').textContent = `${total} temas prontos para transformar em conteúdo`;
+}
+
+function buildCatFilters(area) {
+  const container = document.getElementById('cat-filters');
+  container.innerHTML = '';
+
+  // Collect categories present in filtered area
+  const cats = [...new Set(TEMAS.filter(t => area === 'todos' || t.area === area).map(t => t.cat))].sort();
+
+  const allBtn = document.createElement('button');
+  allBtn.className = 'filter-btn active';
+  allBtn.textContent = 'Todas';
+  allBtn.onclick = () => { selCat = 'todos'; highlightCatBtn(allBtn); renderThemes(selArea, 'todos'); };
+  container.appendChild(allBtn);
+
+  cats.forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'filter-btn';
+    // Label: if single area, use its labels; else try to describe
+    let label = c;
+    const areaLabMap = CAT_LABELS_MAP[area];
+    if (areaLabMap) label = `${c} · ${areaLabMap[c]||c}`;
+    else label = c; // mixed — just letter
+    btn.textContent = label;
+    btn.onclick = () => { selCat = c; highlightCatBtn(btn); renderThemes(selArea, c); };
+    container.appendChild(btn);
+  });
+}
+
+function highlightCatBtn(active) {
+  document.querySelectorAll('#cat-filters .filter-btn').forEach(b => b.classList.toggle('active', b === active));
+}
+
+function renderThemes(area, cat) {
+  const list = document.getElementById('theme-list');
+  list.innerHTML = '';
+  const filtered = TEMAS.filter(t =>
+    (area === 'todos' || t.area === area) &&
+    (cat  === 'todos' || t.cat  === cat)
+  );
+  filtered.forEach(t => {
+    const added = addedThemes.has(t.n);
+    const catLabel  = getCatLabel(t.area, t.cat);
+    const areaLabel = AREA_LABELS[t.area] || t.area;
+    const div = document.createElement('div');
+    div.className = 'theme-card';
+    div.innerHTML = `
+      <div class="theme-num">${t.n > 100 ? t.n - 100 : t.n}</div>
+      <div class="theme-body">
+        <div class="theme-q">${t.q}</div>
+        <div class="theme-tip">${t.tip}</div>
+      </div>
+      <div class="theme-actions">
+        <span class="area-badge">${areaLabel}</span>
+        <span class="theme-badge ${CAT_CLASS[t.cat]}">${t.cat} · ${catLabel}</span>
+        <button class="btn-agendar${added?' added':''}" onclick="openAddModal(${t.n})">${added?'✓ Agendado':'+ Agendar'}</button>
+      </div>`;
+    list.appendChild(div);
+  });
+}
+
+/* ═══════════════════════════════════════════════
+   ROTEIROS
+═══════════════════════════════════════════════ */
+function renderRoteiros() {
+  const list = document.getElementById('roteiro-list');
+  const samples = [
+    {t:TEMAS[0],tipo:'reels',
+     gancho:'Tô sem trabalhar… ainda consigo pedir salário-maternidade?',
+     intro:'Olha só essa dúvida que recebi: "Tô sem trabalhar… ainda consigo pedir salário-maternidade?" Muitas mães acham que porque perderam o emprego, perderam também o direito ao benefício. Mas a verdade não é bem essa…',
+     dev:'Existe uma regra chamada "período de graça". Ela protege quem já trabalhou com carteira assinada. Mesmo depois de perder o emprego, você pode manter a qualidade de segurada do INSS por até 12 meses — e em alguns casos até 24 ou 36 meses.',
+     cta:'Se você está nessa situação, não deixe o tempo passar. Procure um advogado de sua confiança para analisar o seu caso e garantir que você receba tudo o que tem direito.'},
+    {t:TEMAS[47],tipo:'reels',
+     gancho:'Meu filho tem autismo. Ele tem direito ao BPC?',
+     intro:'"Meu filho tem autismo. Ele tem direito ao BPC?" Muitas famílias não sabem que o autismo dá direito a esse benefício — e acabam perdendo anos de amparo financeiro que a lei já garante.',
+     dev:'O autismo é reconhecido como deficiência pelo INSS desde 2013 (Lei Berenice Piana). O BPC paga um salário mínimo por mês. Não precisa de contribuição — só comprovar a deficiência e que a renda familiar é de até 1/4 do salário mínimo por pessoa.',
+     cta:'Se você tem um filho com autismo ou conhece alguma família que precisa saber disso, salva esse vídeo e me segue. Aqui eu posto todo dia conteúdos simples para ajudar famílias a entenderem os direitos das crianças com deficiência junto ao INSS.'},
+    {t:TEMAS[9],tipo:'reels',
+     gancho:'Meu filho já tem 7 meses… ainda dá tempo de pedir salário-maternidade?',
+     intro:'"Meu filho já tem 7 meses… ainda dá tempo de pedir salário-maternidade?" Essa é uma dúvida muito comum — e a resposta vai te surpreender.',
+     dev:'Sim! Você tem até 5 anos após o nascimento do bebê para pedir o salário-maternidade. Muitas mães acreditam que perdem o direito se não pedirem logo depois do parto — mas isso é um mito.',
+     cta:'Se você se identificou com essa situação ou conhece alguma mãe que precisa saber disso, não deixe de seguir o meu perfil. Aqui eu posto diariamente conteúdos simples e práticos sobre seus direitos no INSS.'},
+    {t:TEMAS[37],tipo:'carrossel',
+     gancho:'O INSS negou meu salário-maternidade. Agora perdi tudo?',
+     intro:'INSS negou seu salário-maternidade? NÃO desista! Veja o que fazer em cada etapa:',
+     dev:'Slide 1: Entenda o motivo da negativa. Slide 2: Você pode recorrer administrativamente (CRPS) em até 30 dias. Slide 3: Se o recurso não funcionar, a Justiça Federal pode reverter a decisão. Slide 4: Com advogado especialista, as chances de êxito são muito maiores.',
+     cta:'Salve esse carrossel para não esquecer os seus passos. E se precisar de orientação, procure um advogado de sua confiança.'},
+  ];
+  list.innerHTML = '';
+  samples.forEach(s => {
+    const div = document.createElement('div');
+    div.className = 'roteiro-card';
+    div.innerHTML = `
+      <div class="roteiro-header">
+        <div class="roteiro-title">${s.gancho}</div>
+        <span class="roteiro-type ${s.tipo}">${s.tipo}</span>
+      </div>
+      <div class="roteiro-section"><div class="roteiro-sec-label">🎬 Gancho — primeiros 3 segundos</div><div class="roteiro-text">"${s.gancho}"</div></div>
+      <div class="roteiro-section"><div class="roteiro-sec-label">🎤 Introdução</div><div class="roteiro-text">${s.intro}</div></div>
+      <div class="roteiro-section"><div class="roteiro-sec-label">📖 Desenvolvimento</div><div class="roteiro-text">${s.dev}</div></div>
+      <div class="roteiro-section"><div class="roteiro-sec-label">📣 CTA (ético OAB)</div><div class="roteiro-text">${s.cta}</div></div>`;
+    list.appendChild(div);
+  });
+}
+
+/* ═══════════════════════════════════════════════
+   IMPULSIONAR
+═══════════════════════════════════════════════ */
+const IMP_DATA = {
+  SM: [
+    {q:'Tô sem trabalhar… ainda consigo pedir salário-maternidade?', reason:'Tema de alta dúvida, amplo público feminino desempregado', priority:'alta', tipo:'Reels'},
+    {q:'Meu filho já tem 7 meses… ainda dá tempo?', reason:'Desminte mito popular — alto potencial de compartilhamento', priority:'alta', tipo:'Reels'},
+    {q:'O INSS negou meu salário-maternidade. Agora perdi tudo?', reason:'Alta intenção de contratação — quem nega quer solução', priority:'alta', tipo:'Carrossel'},
+    {q:'Quanto realmente o INSS paga de salário-maternidade?', reason:'Pergunta de fundo de funil — público pronto para contratar', priority:'alta', tipo:'Reels'},
+    {q:'Sou mãe solo. Isso muda algo?', reason:'Alta conexão emocional e engajamento por compartilhamento', priority:'media', tipo:'Reels'},
+    {q:'Pago o INSS como dona de casa. Posso receber?', reason:'Nicho pouco explorado com grande potencial de alcance', priority:'media', tipo:'Carrossel'},
+    {q:'Trabalho como diarista. Tenho direito?', reason:'Público trabalhadora informal — muito amplo no Brasil', priority:'media', tipo:'Reels'},
+    {q:'O salário-maternidade pode ser pedido pela internet?', reason:'Conteúdo prático — fácil de consumir e de converter', priority:'baixa', tipo:'Reels'},
+  ],
+  BPC: [
+    {q:'O INSS negou o BPC do meu filho. Agora perdi tudo?', reason:'Gera raiva e compartilhamento imediato — alta carga emocional', priority:'alta', tipo:'Reels'},
+    {q:'Quanto a família pode ganhar para ter direito ao BPC?', reason:'Dúvida prática e calculável — todo mundo quer saber', priority:'alta', tipo:'Carrossel'},
+    {q:'O BPC de um filho conta na renda para pedir o de outro?', reason:'Informação que surpreende e é compartilhada em grupos', priority:'alta', tipo:'Reels'},
+    {q:'Meu filho vai perder o BPC quando completar 18 anos?', reason:'Ansiedade das famílias sobre o futuro — alto engajamento', priority:'alta', tipo:'Reels'},
+    {q:'O perito disse que meu filho não tem deficiência. É definitivo?', reason:'Alta carga emocional e revolta — ampla identificação', priority:'alta', tipo:'Reels'},
+    {q:'Meu filho tem autismo. Ele tem direito ao BPC?', reason:'Pergunta-chave de topo de funil para o nicho', priority:'media', tipo:'Reels'},
+    {q:'Autismo leve também dá direito ao BPC?', reason:'Dúvida recorrente — elimina barreira de entrada', priority:'media', tipo:'Carrossel'},
+    {q:'O BPC pode ser pedido pela internet ou precisa ir à agência?', reason:'Conteúdo prático e acessível — facilita ação imediata', priority:'baixa', tipo:'Reels'},
+  ],
+  AR: [
+    {q:'Trabalhei a vida toda na roça mas nunca paguei o INSS. Perdi minha aposentadoria?', reason:'Desminte mito enorme — amplo público rural desassistido', priority:'alta', tipo:'Reels'},
+    {q:'O INSS negou minha aposentadoria rural por falta de documento. E agora?', reason:'Alta intenção de contratação — quem é negado quer solução imediata', priority:'alta', tipo:'Reels'},
+    {q:'Minha esposa sempre trabalhou comigo na lavoura mas nunca teve documento. Ela tem direito?', reason:'Surpreende o público — informação pouco conhecida e muito compartilhada', priority:'alta', tipo:'Reels'},
+    {q:'Comecei a trabalhar na roça com 12 anos. Esse tempo conta para aposentadoria?', reason:'Alta identificação emocional — tema de infância no campo', priority:'alta', tipo:'Carrossel'},
+    {q:'Sou pescador artesanal. Tenho direito à aposentadoria rural?', reason:'Nicho específico com alto potencial de alcance regional', priority:'media', tipo:'Reels'},
+    {q:'Posso pedir tutela de urgência para receber a aposentadoria rural enquanto o processo corre?', reason:'Fundo de funil — converte quem já está na Justiça', priority:'media', tipo:'Reels'},
+    {q:'Vale mais a pena recorrer no INSS ou entrar na Justiça para aposentadoria rural?', reason:'Dúvida prática de quem já foi negado — alto engajamento', priority:'media', tipo:'Carrossel'},
+    {q:'Quanto vou receber de aposentadoria rural?', reason:'Pergunta direta de conversão — fundo de funil', priority:'baixa', tipo:'Reels'},
+  ],
+  AE: [
+    {q:'Trabalho em ambiente barulhento faz 20 anos. Isso me dá direito a aposentadoria especial?', reason:'Altíssima identificação — milhões de trabalhadores expostos a ruído', priority:'alta', tipo:'Reels'},
+    {q:'O INSS negou minha aposentadoria especial. Posso recorrer?', reason:'Alta intenção de contratação — quem é negado busca advogado', priority:'alta', tipo:'Reels'},
+    {q:'Minha empresa nunca emitiu o PPP. E agora?', reason:'Gera indignação — muitos trabalhadores passam por isso', priority:'alta', tipo:'Reels'},
+    {q:'O EPI cancela o direito à aposentadoria especial?', reason:'Tema polêmico e de grande dúvida — alto compartilhamento', priority:'alta', tipo:'Carrossel'},
+    {q:'A empresa fechou e não tenho o PPP. Perdi o direito?', reason:'Situação muito comum — desperta esperança e identificação', priority:'alta', tipo:'Reels'},
+    {q:'Sou enfermeira e trabalho com pacientes contagiosos. Isso conta para aposentadoria especial?', reason:'Nicho profissional de saúde — altíssimo alcance', priority:'media', tipo:'Reels'},
+    {q:'Vale a pena converter meu tempo especial em tempo comum para me aposentar mais rápido?', reason:'Planejamento previdenciário — público qualificado e pronto para contratar', priority:'media', tipo:'Carrossel'},
+    {q:'Consigo me aposentar pela atividade especial sem atingir a idade mínima?', reason:'Quebra expectativa — informação pouco conhecida', priority:'baixa', tipo:'Reels'},
+  ],
+  AA: [
+    {q:'Sofri um acidente e fiquei com sequela. O INSS me deu alta mas ainda sinto dor. Perdi o direito?', reason:'Situação real de muitos — alta identificação e busca por solução', priority:'alta', tipo:'Reels'},
+    {q:'O INSS negou meu auxílio-acidente. Posso recorrer?', reason:'Alta intenção de contratação — quem é negado precisa de advogado', priority:'alta', tipo:'Reels'},
+    {q:'Posso receber auxílio-acidente e continuar trabalhando?', reason:'Informação que surpreende — quebra barreira de entrada', priority:'alta', tipo:'Reels'},
+    {q:'Perdi a audição parcialmente por trabalhar em lugar barulhento. Tenho direito ao auxílio-acidente?', reason:'Público enorme de trabalhadores com PAIR — alcance nacional', priority:'alta', tipo:'Carrossel'},
+    {q:'O INSS me deu alta do auxílio-doença mas não concedeu auxílio-acidente. O que faço?', reason:'Situação muito comum — alta frustração e busca imediata por orientação', priority:'alta', tipo:'Reels'},
+    {q:'A empresa se recusa a emitir a CAT do meu acidente. O que faço?', reason:'Gera revolta e compartilhamento — injustiça que todo trabalhador sente', priority:'media', tipo:'Reels'},
+    {q:'Quanto recebo de auxílio-acidente?', reason:'Fundo de funil — quem pergunta já quer o benefício', priority:'media', tipo:'Reels'},
+    {q:'Posso acumular auxílio-acidente com pensão por morte?', reason:'Informação que surpreende — potencial de viralização em grupos', priority:'baixa', tipo:'Carrossel'},
+  ],
+  PM: [
+    {q:'Meu marido faleceu e eu sei que ele pagava o INSS. Tenho direito à pensão?', reason:'Alta carga emocional — público em luto que busca orientação urgente', priority:'alta', tipo:'Reels'},
+    {q:'O INSS negou minha pensão por morte. E agora?', reason:'Alta intenção de contratação — quem é negado precisa de advogado', priority:'alta', tipo:'Reels'},
+    {q:'O falecido tinha duas famílias. Como fica a divisão da pensão?', reason:'Tema polêmico e muito compartilhado — alta curiosidade do público', priority:'alta', tipo:'Reels'},
+    {q:'Vivia com meu companheiro há 10 anos sem casar. Tenho direito à pensão por morte?', reason:'Situação extremamente comum — enorme público de união estável', priority:'alta', tipo:'Carrossel'},
+    {q:'Meu marido havia parado de pagar o INSS há 6 meses quando morreu. Tenho direito à pensão?', reason:'Desminte mito frequente — muitas famílias desistem sem tentar', priority:'alta', tipo:'Reels'},
+    {q:'Se eu me casar de novo, perco a pensão por morte?', reason:'Dúvida prática muito comum — alto engajamento', priority:'media', tipo:'Reels'},
+    {q:'A Reforma de 2019 mudou a pensão por morte?', reason:'Informação importante que muitos desconhecem — potencial de viralização', priority:'media', tipo:'Carrossel'},
+    {q:'Meu filho é portador de deficiência. Tem direito à pensão por morte do pai para sempre?', reason:'Alta carga emocional — famílias de pessoas com deficiência', priority:'baixa', tipo:'Reels'},
+  ]
+};
+
+function filterImpArea(area, btn) {
+  document.querySelectorAll('.imp-area-tab').forEach(b => b.classList.toggle('active', b === btn));
+  renderImpulsionar(area);
+}
+
+function renderImpulsionar(area) {
+  const list = document.getElementById('imp-list');
+  list.innerHTML = '';
+  (IMP_DATA[area] || IMP_DATA.SM).forEach(r => {
+    const div = document.createElement('div');
+    div.className = 'imp-card';
+    div.innerHTML = `
+      <div class="imp-priority ${r.priority}"></div>
+      <div class="imp-info"><div class="imp-title">${r.q}</div><div class="imp-reason">${r.reason}</div></div>
+      <span class="imp-badge">${r.tipo}</span>`;
+    list.appendChild(div);
+  });
+  const leg = document.createElement('div');
+  leg.className = 'imp-legend';
+  leg.innerHTML = `
+    <span><div class="imp-legend-dot" style="background:#E24B4A"></div>Alta prioridade</span>
+    <span><div class="imp-legend-dot" style="background:#EF9F27"></div>Média prioridade</span>
+    <span><div class="imp-legend-dot" style="background:#639922"></div>Baixa prioridade</span>`;
+  list.appendChild(leg);
+}
+
+/* ═══════════════════════════════════════════════
+   INSIGHTS
+═══════════════════════════════════════════════ */
+function renderInsights() {
+  const areaConfigs = [
+    { id:'cat-bars-sm',  cats:{A:9,B:6,C:7,D:9,E:6,F:11},        labels:CAT_LABELS_SM },
+    { id:'cat-bars-bpc', cats:{A:5,B:6,C:5,D:5,E:6,F:4,G:11},    labels:CAT_LABELS_BPC },
+    { id:'cat-bars-ar',  cats:{A:9,B:6,C:7,D:9,E:6,F:11},         labels:CAT_LABELS_AR },
+    { id:'cat-bars-ae',  cats:{A:9,B:6,C:7,D:9,E:6,F:11},         labels:CAT_LABELS_AE },
+    { id:'cat-bars-aa',  cats:{A:9,B:6,C:7,D:7,E:6,F:7,G:6},      labels:CAT_LABELS_AA },
+    { id:'cat-bars-pm',  cats:{A:9,B:6,C:7,D:9,E:6,F:5,G:6},      labels:CAT_LABELS_PM },
+  ];
+  areaConfigs.forEach(({id, cats, labels}) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.innerHTML = '';
+    const maxN = Math.max(...Object.values(cats));
+    Object.entries(cats).forEach(([c,n]) => {
+      const row = document.createElement('div');
+      row.className = 'bar-row';
+      row.innerHTML = `<div class="bar-label">${c} · ${labels[c]||c}</div><div class="bar-track"><div class="bar-fill ${CAT_CLASS[c]}" style="width:${Math.round(n/maxN*100)}%"></div></div><div class="bar-count">${n}</div>`;
+      el.appendChild(row);
+    });
+  });
+}
+
+/* ═══════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════════
+   TEMAS EM ALTA — fetch dinâmico do GitHub
+   Fase 2: trocar TREND_URL por endpoint Supabase
+═══════════════════════════════════════════════ */
+const TREND_URL = 'https://raw.githubusercontent.com/mBaldez/baldezlabs-previdenciario/main/dados/temas_em_alta.json';
+const AREA_LABELS_FULL = {SM:'Salário Maternidade',BPC:'BPC/LOAS',AR:'Aposen. Rural',AE:'Aposen. Especial',AA:'Auxílio Acidente',PM:'Pensão por Morte'};
+
+async function loadTendencias() {
+  try {
+    const r = await fetch(TREND_URL + '?t=' + Date.now());
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const data = await r.json();
+    renderTendencias(data);
+  } catch(e) {
+    console.warn('[Tendências]', e.message);
+    renderTendencias(null);
+  }
+}
+
+function renderTendencias(data) {
+  const meta = document.getElementById('trend-meta');
+  const container = document.getElementById('trend-container');
+  if (!data) {
+    meta.innerHTML = '<span style="color:#EF9F27">⚠ Não foi possível carregar. Verifique a conexão ou o repositório.</span>';
+    container.innerHTML = '<div class="trend-empty">Dados não disponíveis no momento.</div>';
+    return;
+  }
+  meta.innerHTML =
+    '<span>📅 Última atualização: <span class="trend-update-date">' + (data.gerado_em||'—') + '</span> · Fonte: ' + (data.fonte||'—') + '</span>' +
+    '<span>🔄 Próxima: ' + (data.proxima_atualizacao||'domingo automático') + '</span>';
+  const temas = data.temas_em_alta || [];
+  if (!temas.length) {
+    container.innerHTML = '<div class="trend-empty">Nenhum tema em alta registrado ainda.</div>';
+    return;
+  }
+  container.innerHTML = '<div class="trend-cards">' + temas.map(function(t) {
+    const areaLabel = AREA_LABELS_FULL[t.area] || t.area;
+    const pct = Math.min(100, (t.score_estimado / 10) * 100).toFixed(0);
+    const hashtags = (t.hashtags_relacionadas || []);
+    const hashStr = hashtags.join(' ').replace(/"/g,'&quot;');
+    return '<div class="trend-card">' +
+      '<div class="trend-card-top">' +
+        '<span class="trend-area-tag">' + areaLabel + '</span>' +
+        '<span class="trend-score">' + t.score_estimado + '</span>' +
+      '</div>' +
+      '<div class="trend-score-bar"><div class="trend-score-fill" style="width:' + pct + '%"></div></div>' +
+      '<div class="trend-tema">' + t.tema + '</div>' +
+      '<div class="trend-motivo">' + t.motivo + '</div>' +
+      '<div class="trend-hashtags">' + hashtags.map(function(h){return '<span class="trend-hashtag">'+h+'</span>';}).join('') + '</div>' +
+      '<button class="trend-btn-copy" data-hash="' + hashStr + '">📋 Copiar hashtags</button>' +
+    '</div>';
+  }).join('') + '</div>';
+  container.querySelectorAll('.trend-btn-copy').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      navigator.clipboard.writeText(this.dataset.hash).then(function() {
+        btn.textContent = '✅ Copiado!';
+        btn.classList.add('copied');
+        setTimeout(function(){ btn.textContent = '📋 Copiar hashtags'; btn.classList.remove('copied'); }, 2000);
+      });
+    });
+  });
+}
+
+renderCalendar();
+buildCatFilters('todos');
+renderThemes('todos', 'todos');
+renderRoteiros();
+renderImpulsionar('SM');
+renderInsights();
+loadTendencias();
+</script>
+</body>
+</html>
