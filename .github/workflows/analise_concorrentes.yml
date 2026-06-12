@@ -33,6 +33,8 @@ jobs:
       - name: Executar análise de mercado
         env:
           CONCORRENTES_LIST: ${{ secrets.CONCORRENTES_LIST }}
+          IG_USER: ${{ secrets.IG_USER }}
+          IG_PASS: ${{ secrets.IG_PASS }}
         run: python scripts/analise_concorrencia.py
 
       - name: Commit e push dos resultados
