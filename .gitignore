@@ -1,0 +1,27 @@
+# Credenciais e segredos
+.env
+.env.local
+secrets.json
+token.json
+credentials.json
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Node (se usado no dashboard)
+node_modules/
+npm-debug.log
+
+# Dados sensíveis
+dados/metricas_raw.json
+dados/access_token.txt

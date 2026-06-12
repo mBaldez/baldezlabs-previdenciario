@@ -1,0 +1,29 @@
+{
+  "gerado_em": "2026-06-12",
+  "fonte": "analise_manual",
+  "proxima_atualizacao": "automatica_via_github_actions",
+  "temas_em_alta": [
+    {
+      "tema": "BPC para autismo leve — nível 1",
+      "area": "BPC",
+      "score_estimado": 9.2,
+      "motivo": "Alta busca + muita desinformação sobre níveis de suporte",
+      "hashtags_relacionadas": ["#bpc", "#autismo", "#tea", "#direitoprevidenciario"]
+    },
+    {
+      "tema": "Pensão por morte — duas famílias",
+      "area": "PM",
+      "score_estimado": 8.8,
+      "motivo": "Alta carga emocional + muito compartilhado em grupos de família",
+      "hashtags_relacionadas": ["#pensaopormorte", "#inss", "#direitosprevidenciarios"]
+    },
+    {
+      "tema": "Aposentadoria rural para pescador artesanal",
+      "area": "AR",
+      "score_estimado": 8.5,
+      "motivo": "Nicho pouco explorado pela concorrência",
+      "hashtags_relacionadas": ["#pescador", "#aposentadoriarural", "#seguidorespecial"]
+    }
+  ],
+  "nota": "Arquivo atualizado manualmente. Após configurar GitHub Actions, será gerado automaticamente a cada 7 dias."
+}
