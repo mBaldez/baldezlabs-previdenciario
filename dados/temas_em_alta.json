@@ -3,5 +3,70 @@
   "fonte": "apify_instagram_scraper",
   "proxima_atualizacao": "automatica_via_github_actions",
   "score_corte": 8.6,
-  "temas_em_alta": []
+  "temas_em_alta": [
+    {
+      "tema": "BPC / LOAS",
+      "area": "BPC",
+      "score_estimado": 6.8,
+      "motivo": "9 posts analisados · média 1872 likes · 1 perfis abordaram o tema",
+      "hashtags_relacionadas": [
+        "#bpcloas",
+        "#inss",
+        "#direitoprevidenciário",
+        "#loas",
+        "#bpc"
+      ]
+    },
+    {
+      "tema": "Aposentadoria Especial",
+      "area": "AE",
+      "score_estimado": 6.5,
+      "motivo": "3 posts analisados · média 790 likes · 2 perfis abordaram o tema",
+      "hashtags_relacionadas": [
+        "#aposentadoriaespecial",
+        "#inss",
+        "#direitoprevidenciario",
+        "#adi6309",
+        "#stf"
+      ]
+    },
+    {
+      "tema": "Salário Maternidade",
+      "area": "SM",
+      "score_estimado": 5.9,
+      "motivo": "1 posts analisados · média 1117 likes · 1 perfis abordaram o tema",
+      "hashtags_relacionadas": [
+        "#saláriomaternidade",
+        "#inss",
+        "#gestante",
+        "#maternidade",
+        "#direitoprevidenciário"
+      ]
+    },
+    {
+      "tema": "Aposentadoria Rural",
+      "area": "AR",
+      "score_estimado": 5.9,
+      "motivo": "1 posts analisados · média 59587 likes · 1 perfis abordaram o tema",
+      "hashtags_relacionadas": [
+        "#agricultor",
+        "#aposentadoriarural",
+        "#inss",
+        "#direitoprevidenciário"
+      ]
+    },
+    {
+      "tema": "Auxílio Acidente",
+      "area": "AA",
+      "score_estimado": 3.0,
+      "motivo": "1 posts analisados · média 41 likes · 1 perfis abordaram o tema",
+      "hashtags_relacionadas": [
+        "#auxilioacidente",
+        "#inss",
+        "#direitoprevidenciario",
+        "#acidentedetrabalho",
+        "#aposentadoria"
+      ]
+    }
+  ]
 }
