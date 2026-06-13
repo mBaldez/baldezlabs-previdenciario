@@ -30,11 +30,26 @@ jobs:
 
       - name: Executar analise Google Trends
         run: python scripts/analise_concorrencia.py
+        continue-on-error: true
+
+      - name: Atualizar data mesmo sem novos dados
+        run: |
+          python3 -c "
+import json, os
+from datetime import datetime
+path = 'dados/temas_em_alta.json'
+if os.path.exists(path):
+    with open(path) as f:
+        data = json.load(f)
+    data['ultima_tentativa'] = datetime.now().strftime('%Y-%m-%d')
+    with open(path, 'w') as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+"
 
       - name: Commit e push
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Actions"
           git add dados/temas_em_alta.json
-          git diff --staged --quiet || git commit -m "Atualiza temas em alta - $(date +'%Y-%m-%d')"
+          git diff --staged --quiet || git commit -m "Verificacao semanal - $(date +'%Y-%m-%d')"
           git push
