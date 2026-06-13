@@ -1,15 +1,9 @@
 """
-Análise de Tendências de Busca — BaldezLabs
-=============================================
+Analise de Tendencias de Busca - BaldezLabs
+============================================
 Usa Google Trends (pytrends) para identificar o que as pessoas
-estão buscando sobre direito previdenciário no Brasil.
-
-Foco: intenção de busca dos clientes, não conteúdo da concorrência.
-
-Secrets necessários (GitHub):
-  CONCORRENTES_LIST  — mantido por compatibilidade, não usado aqui
-
-Sem custo — Google Trends é gratuito.
+estao buscando sobre direito previdenciario no Brasil.
+Roda localmente (IP residencial) para evitar bloqueio do Google.
 """
 
 import json, os, time
@@ -19,54 +13,27 @@ from pytrends.request import TrendReq
 BASE_DIR    = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUTPUT_JSON = os.path.join(BASE_DIR, "dados", "temas_em_alta.json")
 
-# ── Termos de busca por área ────────────────────────────────────
-# Frases que clientes reais digitam no Google
-TERMOS = {
-    "BPC": [
-        "BPC autismo",
-        "como pedir BPC",
-        "BPC LOAS deficiência",
-        "BPC criança",
-    ],
-    "SM": [
-        "salário maternidade INSS",
-        "como receber salário maternidade",
-        "salário maternidade MEI",
-    ],
-    "AR": [
-        "aposentadoria rural documentos",
-        "segurado especial INSS",
-        "aposentadoria trabalhador rural",
-    ],
-    "AE": [
-        "aposentadoria especial insalubre",
-        "tempo especial INSS",
-        "aposentadoria especial como funciona",
-    ],
-    "PM": [
-        "pensão por morte como receber",
-        "pensão por morte cônjuge",
-        "pensão por morte filhos",
-    ],
-    "AI": [
-        "aposentadoria por invalidez",
-        "como se aposentar por doença",
-        "auxílio doença INSS",
-    ],
+TERMOS_PRINCIPAIS = {
+    "BPC": "BPC autismo",
+    "SM":  "salario maternidade INSS",
+    "AR":  "aposentadoria rural",
+    "AE":  "aposentadoria especial",
+    "PM":  "pensao por morte",
+    "AI":  "aposentadoria por invalidez",
 }
 
 NOMES = {
     "BPC": "BPC / LOAS",
-    "SM":  "Salário Maternidade",
+    "SM":  "Salario Maternidade",
     "AR":  "Aposentadoria Rural",
     "AE":  "Aposentadoria Especial",
-    "PM":  "Pensão por Morte",
-    "AI":  "Aposentadoria por Invalidez / Auxílio Doença",
+    "PM":  "Pensao por Morte",
+    "AI":  "Aposentadoria por Invalidez",
 }
 
 HASHTAGS = {
     "BPC": ["#bpc", "#autismo", "#tea", "#loas", "#direitoprevidenciario"],
-    "SM":  ["#salariomaternidade", "#maternidade", "#inss", "#mei", "#direitoprevidenciario"],
+    "SM":  ["#salariomaternidade", "#maternidade", "#mei", "#inss", "#direitoprevidenciario"],
     "AR":  ["#aposentadoriarural", "#seguidorespecial", "#trabalhadorarural", "#inss"],
     "AE":  ["#aposentadoriaespecial", "#insalubre", "#tempoespecial", "#inss"],
     "PM":  ["#pensaopormorte", "#inss", "#dependente", "#direitosprevidenciarios"],
@@ -74,19 +41,19 @@ HASHTAGS = {
 }
 
 ANGULO = {
-    "BPC": "Muitas famílias não sabem que têm direito — explique os critérios de forma simples",
-    "SM":  "MEIs e autônomas têm dúvidas frequentes — conteúdo prático converte muito",
-    "AR":  "Documentação é a maior dificuldade — roteiros de 'o que preciso juntar' têm alto alcance",
-    "AE":  "Profissionais de saúde e construção civil são nichos de alto valor — foque em casos reais",
-    "PM":  "Alta carga emocional — conteúdo empático sobre prazos e documentos gera confiança",
-    "AI":  "Pessoas em sofrimento buscam esperança — linguagem acolhedora + orientação prática",
+    "BPC": "Muitas familias nao sabem que tem direito - explique os criterios de forma simples",
+    "SM":  "MEIs e autonomas tem duvidas frequentes - conteudo pratico converte muito",
+    "AR":  "Documentacao e a maior dificuldade - roteiros de 'o que preciso juntar' tem alto alcance",
+    "AE":  "Profissionais de saude e construcao civil sao nichos de alto valor - foque em casos reais",
+    "PM":  "Alta carga emocional - conteudo empatico sobre prazos e documentos gera confianca",
+    "AI":  "Pessoas em sofrimento buscam esperanca - linguagem acolhedora + orientacao pratica",
 }
 
-SCORE_CORTE = 6.0  # interesse ≥ 60/100 no Google Trends
+SCORE_CORTE = 6.0
 
 
-def buscar_um_termo(pytrends, area, termo):
-    """Tenta buscar um único termo, com retry em caso de 429."""
+def buscar_um_termo(pytrends, termo):
+    """Tenta buscar um unico termo, com retry em caso de 429."""
     for tentativa in range(3):
         try:
             pytrends.build_payload([termo], timeframe="today 1-m", geo="BR")
@@ -96,61 +63,50 @@ def buscar_um_termo(pytrends, area, termo):
             return 0
         except Exception as e:
             msg = str(e)
-            if "429" in msg or "Too Many" in msg.lower():
+            if "429" in msg or "too many" in msg.lower():
                 espera = 20 + tentativa * 15
-                print(f"  ⏳ Rate limit — aguardando {espera}s antes de tentar novamente...")
+                print(f"  Rate limit - aguardando {espera}s...")
                 time.sleep(espera)
             else:
-                print(f"  ⚠️  Erro: {e}")
+                print(f"  Erro: {e}")
                 return None
     return None
 
 
 def buscar_tendencias():
-    """Consulta Google Trends termo a termo para evitar bloqueios."""
     pytrends = TrendReq(hl="pt-BR", tz=-180, timeout=(15, 30))
     resultados = {}
+    total = len(TERMOS_PRINCIPAIS)
 
-    # Um termo representativo por área (o mais pesquisado)
-    termos_principais = {
-        "BPC": "BPC autismo",
-        "SM":  "salario maternidade INSS",
-        "AR":  "aposentadoria rural",
-        "AE":  "aposentadoria especial",
-        "PM":  "pensao por morte",
-        "AI":  "aposentadoria por invalidez",
-    }
-
-    total = len(termos_principais)
-    for i, (area, termo) in enumerate(termos_principais.items(), 1):
-        print(f"  [{i}/{total}] Buscando: '{termo}'...", end=" ", flush=True)
-        interesse = buscar_um_termo(pytrends, area, termo)
+    for i, (area, termo) in enumerate(TERMOS_PRINCIPAIS.items(), 1):
+        print(f"  [{i}/{total}] '{termo}'...", end=" ", flush=True)
+        interesse = buscar_um_termo(pytrends, termo)
         if interesse is not None:
             resultados[area] = {"termo": termo, "interesse": interesse}
             print(f"{interesse}/100")
         else:
             print("sem dados")
         if i < total:
-            time.sleep(8)  # pausa entre termos para evitar rate limit
+            time.sleep(8)
 
     return resultados
 
 
 def gerar_temas(resultados):
     temas = []
-    print("\n📊 Interesse detectado (Google Trends Brasil — último mês):")
+    print("\nInteresse detectado (Google Trends Brasil - ultimo mes):")
     for area, dado in sorted(resultados.items(), key=lambda x: -x[1]["interesse"]):
         interesse = dado["interesse"]
-        score     = round(min(interesse / 10, 10.0), 1)
-        flag      = "✅" if score >= SCORE_CORTE else "  "
-        print(f"   {flag} {area}: {interesse}/100 (score {score}) — '{dado['termo']}'")
+        score = round(min(interesse / 10, 10.0), 1)
+        flag = "OK" if score >= SCORE_CORTE else "  "
+        print(f"   {flag} {area}: {interesse}/100 (score {score}) - '{dado['termo']}'")
         temas.append({
-            "tema":               NOMES.get(area, area),
-            "area":               area,
-            "termo_pesquisado":   dado["termo"],
-            "interesse_google":   interesse,
-            "score_estimado":     score,
-            "angulo_conteudo":    ANGULO.get(area, ""),
+            "tema":                  NOMES.get(area, area),
+            "area":                  area,
+            "termo_pesquisado":      dado["termo"],
+            "interesse_google":      interesse,
+            "score_estimado":        score,
+            "angulo_conteudo":       ANGULO.get(area, ""),
             "hashtags_relacionadas": HASHTAGS.get(area, []),
         })
 
@@ -160,10 +116,35 @@ def gerar_temas(resultados):
 
 
 def main():
-    print("🔍 Analisando tendências de busca no Google (Brasil)...")
-    print("   Período: último mês · Região: BR\n")
+    print("Analisando tendencias de busca no Google (Brasil)...")
+    print("Periodo: ultimo mes - Regiao: BR\n")
 
     resultados = buscar_tendencias()
 
     if not resultados:
-        p
+        print("Nenhum dado retornado. Mantendo JSON existente.")
+        return
+
+    temas = gerar_temas(resultados)
+
+    output = {
+        "gerado_em":           datetime.now().strftime("%Y-%m-%d"),
+        "fonte":               "google_trends_brasil",
+        "periodo":             "ultimo_mes",
+        "proxima_atualizacao": "automatica_via_github_actions",
+        "score_corte":         SCORE_CORTE,
+        "temas_em_alta":       temas,
+    }
+
+    # Validar JSON antes de salvar
+    content = json.dumps(output, ensure_ascii=False, indent=2)
+    json.loads(content)  # lanca excecao se invalido
+
+    with open(OUTPUT_JSON, "w", encoding="utf-8") as f:
+        f.write(content)
+
+    print(f"\n{len(temas)} temas salvos em dados/temas_em_alta.json")
+
+
+if __name__ == "__main__":
+    main()
