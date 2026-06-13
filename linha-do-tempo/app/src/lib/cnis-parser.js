@@ -6,17 +6,12 @@
  * PDFs que não sejam CNIS do INSS não serão reconhecidos — isso é intencional.
  */
 
-const MESES_MAP = {
-  'jan': 1, 'fev': 2, 'mar': 3, 'abr': 4, 'mai': 5, 'jun': 6,
-  'jul': 7, 'ago': 8, 'set': 9, 'out': 10, 'nov': 11, 'dez': 12,
-}
-
 /**
  * Tenta parsear uma data no formato "MM/AAAA" ou "MM-AAAA"
  * @returns {{ mes: number, ano: number } | null}
  */
 function parsarData(str) {
-  const match = str.match(/(\d{2})[\/\-](\d{4})/)
+  const match = str.match(/(\d{2})[/-](\d{4})/)
   if (!match) return null
   return { mes: parseInt(match[1]), ano: parseInt(match[2]) }
 }
@@ -35,7 +30,6 @@ function extrairVinculosDoTexto(textoCompleto) {
   const linhas = textoCompleto.split('\n').map(l => l.trim()).filter(Boolean)
 
   let empregadorAtual = null
-  let admissaoAtual = null
 
   for (let i = 0; i < linhas.length; i++) {
     const linha = linhas[i]
@@ -60,7 +54,6 @@ function extrairVinculosDoTexto(textoCompleto) {
           fim_ano: fim.ano,
         })
         empregadorAtual = null
-        admissaoAtual = null
       }
     }
   }
