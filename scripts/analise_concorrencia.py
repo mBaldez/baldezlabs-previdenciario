@@ -1,225 +1,166 @@
 """
-Análise de Mercado — BaldezLabs
-================================
-Usa Apify (Instagram Scraper) para coletar posts públicos.
+Análise de Tendências de Busca — BaldezLabs
+=============================================
+Usa Google Trends (pytrends) para identificar o que as pessoas
+estão buscando sobre direito previdenciário no Brasil.
 
-Secrets necessários:
-  CONCORRENTES_LIST  — perfil1,perfil2,perfil3
-  APIFY_TOKEN        — token em console.apify.com/account/integrations
+Foco: intenção de busca dos clientes, não conteúdo da concorrência.
+
+Secrets necessários (GitHub):
+  CONCORRENTES_LIST  — mantido por compatibilidade, não usado aqui
+
+Sem custo — Google Trends é gratuito.
 """
 
-import json
-import os
-import time
-import requests
-import statistics
+import json, os, time
 from datetime import datetime
-from collections import Counter
+from pytrends.request import TrendReq
 
 BASE_DIR    = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUTPUT_JSON = os.path.join(BASE_DIR, "dados", "temas_em_alta.json")
 
-APIFY_ACTOR = "apify~instagram-scraper"
-SCORE_CORTE = 8.6
-
-CATEGORIAS = {
-    "SM":  ["salariomaternidade", "maternidade", "inssmaternidade", "licencamaternidade"],
-    "BPC": ["bpc", "autismo", "tea", "beneficioassistencial", "loas", "bpcautismo"],
-    "AR":  ["aposentadoriarural", "seguidorespecial", "trabalhadorarural", "agricultora", "pescador"],
-    "AE":  ["aposentadoriaespecial", "insalubre", "ppp", "tempoespecial", "periculosidade"],
-    "AA":  ["auxilioacidente", "acidentedetrabalho", "cat", "sequela"],
-    "PM":  ["pensaopormorte", "pensao", "dependente", "obito"],
+# ── Termos de busca por área ────────────────────────────────────
+# Frases que clientes reais digitam no Google
+TERMOS = {
+    "BPC": [
+        "BPC autismo",
+        "como pedir BPC",
+        "BPC LOAS deficiência",
+        "BPC criança",
+    ],
+    "SM": [
+        "salário maternidade INSS",
+        "como receber salário maternidade",
+        "salário maternidade MEI",
+    ],
+    "AR": [
+        "aposentadoria rural documentos",
+        "segurado especial INSS",
+        "aposentadoria trabalhador rural",
+    ],
+    "AE": [
+        "aposentadoria especial insalubre",
+        "tempo especial INSS",
+        "aposentadoria especial como funciona",
+    ],
+    "PM": [
+        "pensão por morte como receber",
+        "pensão por morte cônjuge",
+        "pensão por morte filhos",
+    ],
+    "AI": [
+        "aposentadoria por invalidez",
+        "como se aposentar por doença",
+        "auxílio doença INSS",
+    ],
 }
 
 NOMES = {
-    "SM": "Salário Maternidade",
     "BPC": "BPC / LOAS",
-    "AR": "Aposentadoria Rural",
-    "AE": "Aposentadoria Especial",
-    "AA": "Auxílio Acidente",
-    "PM": "Pensão por Morte",
+    "SM":  "Salário Maternidade",
+    "AR":  "Aposentadoria Rural",
+    "AE":  "Aposentadoria Especial",
+    "PM":  "Pensão por Morte",
+    "AI":  "Aposentadoria por Invalidez / Auxílio Doença",
 }
 
-IGNORAR_EMERGENTES = {"inss","previdencia","advogado","direito","brasil","juridico",
-                      "advogados","previdenciario","social","advocacia"}
+HASHTAGS = {
+    "BPC": ["#bpc", "#autismo", "#tea", "#loas", "#direitoprevidenciario"],
+    "SM":  ["#salariomaternidade", "#maternidade", "#inss", "#mei", "#direitoprevidenciario"],
+    "AR":  ["#aposentadoriarural", "#seguidorespecial", "#trabalhadorarural", "#inss"],
+    "AE":  ["#aposentadoriaespecial", "#insalubre", "#tempoespecial", "#inss"],
+    "PM":  ["#pensaopormorte", "#inss", "#dependente", "#direitosprevidenciarios"],
+    "AI":  ["#aposentadoriainvalidez", "#auxiliodoenca", "#inss", "#direitoprevidenciario"],
+}
+
+ANGULO = {
+    "BPC": "Muitas famílias não sabem que têm direito — explique os critérios de forma simples",
+    "SM":  "MEIs e autônomas têm dúvidas frequentes — conteúdo prático converte muito",
+    "AR":  "Documentação é a maior dificuldade — roteiros de 'o que preciso juntar' têm alto alcance",
+    "AE":  "Profissionais de saúde e construção civil são nichos de alto valor — foque em casos reais",
+    "PM":  "Alta carga emocional — conteúdo empático sobre prazos e documentos gera confiança",
+    "AI":  "Pessoas em sofrimento buscam esperança — linguagem acolhedora + orientação prática",
+}
+
+SCORE_CORTE = 6.0  # interesse ≥ 60/100 no Google Trends
 
 
-# ── helpers ────────────────────────────────────────────────────
+def buscar_tendencias():
+    """Consulta Google Trends para todos os termos, em lotes de 5."""
+    pytrends = TrendReq(hl="pt-BR", tz=-180, timeout=(10, 25), retries=2, backoff_factor=0.5)
+    resultados = {}
 
-def carregar_perfis():
-    raw = os.environ.get("CONCORRENTES_LIST", "").strip()
-    if not raw:
-        raise EnvironmentError("CONCORRENTES_LIST não definida.")
-    perfis = [p.strip() for p in raw.split(",") if p.strip()]
-    print(f"📋 {len(perfis)} perfis carregados")
-    return perfis
+    todos_termos = [(area, termo) for area, lista in TERMOS.items() for termo in lista]
+    lotes = [todos_termos[i:i+5] for i in range(0, len(todos_termos), 5)]
 
+    for idx, lote in enumerate(lotes):
+        palavras = [t for _, t in lote]
+        print(f"  🔍 Lote {idx+1}/{len(lotes)}: {palavras}")
+        try:
+            pytrends.build_payload(palavras, timeframe="today 1-m", geo="BR")
+            df = pytrends.interest_over_time()
+            if not df.empty:
+                for area, termo in lote:
+                    if termo in df.columns:
+                        interesse = int(df[termo].mean())
+                        if area not in resultados or interesse > resultados[area]["interesse"]:
+                            resultados[area] = {"termo": termo, "interesse": interesse}
+        except Exception as e:
+            print(f"  ⚠️  Erro no lote: {e}")
+        if idx < len(lotes) - 1:
+            time.sleep(3)
 
-def extrair_hashtags(texto):
-    if not texto:
-        return []
-    return [t.lower().lstrip("#") for t in texto.split() if t.startswith("#")]
-
-
-def classificar(hashtags):
-    contagem = {a: 0 for a in CATEGORIAS}
-    for tag in hashtags:
-        for area, palavras in CATEGORIAS.items():
-            if any(p in tag for p in palavras):
-                contagem[area] += 1
-    melhor = max(contagem, key=contagem.get)
-    return melhor if contagem[melhor] > 0 else "OUTROS"
-
-
-def calcular_score(likes_lista, n_posts, n_perfis, total_perfis):
-    if n_posts == 0:
-        return 0.0
-    mediana     = statistics.median(likes_lista) if likes_lista else 0
-    likes_score = min(mediana / 150, 1.0) * 4.0
-    freq_score  = (n_perfis / total_perfis) * 3.5
-    saturacao   = n_perfis / total_perfis
-    sat_bonus   = (1 - saturacao) * 1.5 if saturacao > 0.5 else 1.5
-    vol_score   = min(n_posts / 10, 1.0) * 1.0
-    return round(min(likes_score + freq_score + sat_bonus + vol_score, 10.0), 1)
+    return resultados
 
 
-# ── Apify async ────────────────────────────────────────────────
-
-def coletar_via_apify(usernames, token):
-    urls = [f"https://www.instagram.com/{u}/" for u in usernames]
-    print(f"🌐 Iniciando run Apify para {len(usernames)} perfis...")
-
-    # 1. Inicia run
-    r = requests.post(
-        f"https://api.apify.com/v2/acts/{APIFY_ACTOR}/runs",
-        params={"token": token},
-        json={"directUrls": urls, "resultsType": "posts", "resultsLimit": 20},
-        timeout=30,
-    )
-    r.raise_for_status()
-    data       = r.json()["data"]
-    run_id     = data["id"]
-    dataset_id = data["defaultDatasetId"]
-    print(f"   Run ID: {run_id}")
-
-    # 2. Aguarda conclusão (máx 8 min)
-    for i in range(48):
-        time.sleep(10)
-        s = requests.get(
-            f"https://api.apify.com/v2/actor-runs/{run_id}",
-            params={"token": token}, timeout=15
-        ).json()["data"]["status"]
-        print(f"   [{(i+1)*10}s] {s}")
-        if s in ("SUCCEEDED", "FAILED", "ABORTED", "TIMED-OUT"):
-            if s != "SUCCEEDED":
-                print(f"⚠️  Run terminou com: {s}")
-                return []
-            break
-
-    # 3. Busca resultados
-    items = requests.get(
-        f"https://api.apify.com/v2/datasets/{dataset_id}/items",
-        params={"token": token, "format": "json", "clean": "true"},
-        timeout=60,
-    ).json()
-    print(f"   {len(items)} posts recebidos")
-    return items
-
-
-# ── processamento ──────────────────────────────────────────────
-
-def processar(items, total_perfis):
-    por_area       = {}
-    hashtags_outros = []
-
-    for item in items:
-        caption  = item.get("caption") or item.get("alt") or ""
-        likes    = item.get("likesCount") or item.get("likes") or 0
-        owner    = item.get("ownerUsername") or item.get("username") or ""
-        hashtags = extrair_hashtags(caption)
-        area     = classificar(hashtags)
-
-        if area == "OUTROS":
-            hashtags_outros.extend(hashtags)
-            continue
-
-        if area not in por_area:
-            por_area[area] = {"likes": [], "hashtags": [], "perfis": set()}
-
-        por_area[area]["likes"].append(likes)
-        por_area[area]["hashtags"].extend(hashtags)
-        por_area[area]["perfis"].add(owner)
-
-    # Temas emergentes (top hashtags de posts não classificados)
-    top_outros = [
-        f"#{t}" for t, _ in Counter(hashtags_outros).most_common(15)
-        if len(t) > 4 and t not in IGNORAR_EMERGENTES
-    ]
-
-    # Calcula scores
+def gerar_temas(resultados):
     temas = []
-    for area, d in por_area.items():
-        n_posts  = len(d["likes"])
-        n_perfis = len(d["perfis"])
-        score    = calcular_score(d["likes"], n_posts, n_perfis, total_perfis)
-        mediana_l = int(statistics.median(d["likes"])) if d["likes"] else 0
-        top_tags = [f"#{t}" for t, _ in Counter(d["hashtags"]).most_common(5)]
+    print("\n📊 Interesse detectado (Google Trends Brasil — último mês):")
+    for area, dado in sorted(resultados.items(), key=lambda x: -x[1]["interesse"]):
+        interesse = dado["interesse"]
+        score     = round(min(interesse / 10, 10.0), 1)
+        flag      = "✅" if score >= SCORE_CORTE else "  "
+        print(f"   {flag} {area}: {interesse}/100 (score {score}) — '{dado['termo']}'")
         temas.append({
-            "tema": NOMES.get(area, area),
-            "area": area,
-            "score_estimado": score,
-            "motivo": f"{n_posts} posts · mediana {mediana_l} likes · {n_perfis} perfis abordaram",
-            "hashtags_relacionadas": top_tags,
+            "tema":               NOMES.get(area, area),
+            "area":               area,
+            "termo_pesquisado":   dado["termo"],
+            "interesse_google":   interesse,
+            "score_estimado":     score,
+            "angulo_conteudo":    ANGULO.get(area, ""),
+            "hashtags_relacionadas": HASHTAGS.get(area, []),
         })
 
     temas.sort(key=lambda x: x["score_estimado"], reverse=True)
-
-    # Diagnóstico
-    print("\n📊 Scores detectados:")
-    for t in temas:
-        flag = "✅" if t["score_estimado"] >= SCORE_CORTE else "  "
-        print(f"   {flag} {t['area']}: {t['score_estimado']} — {t['motivo']}")
-    print(f"\n🔎 Emergentes: {top_outros[:5]}")
-
-    classificados = sum(len(d["likes"]) for d in por_area.values())
     acima = [t for t in temas if t["score_estimado"] >= SCORE_CORTE]
-    return (acima if acima else temas[:6]), top_outros, len(items), classificados
+    return acima if acima else temas[:6]
 
-
-# ── main ───────────────────────────────────────────────────────
 
 def main():
-    print("🔍 Iniciando análise de mercado via Apify...")
+    print("🔍 Analisando tendências de busca no Google (Brasil)...")
+    print("   Período: último mês · Região: BR\n")
 
-    token = os.environ.get("APIFY_TOKEN", "").strip()
-    if not token:
-        raise EnvironmentError("APIFY_TOKEN não definido.")
+    resultados = buscar_tendencias()
 
-    perfis = carregar_perfis()
+    if not resultados:
+        print("⚠️  Nenhum dado retornado pelo Google Trends.")
+        return
 
-    try:
-        items = coletar_via_apify(perfis, token)
-    except Exception as e:
-        print(f"⚠️  Erro na coleta: {e}")
-        items = []
-
-    temas, top_outros, total, classificados = processar(items, len(perfis))
+    temas = gerar_temas(resultados)
 
     output = {
-        "gerado_em": datetime.now().strftime("%Y-%m-%d"),
-        "fonte": "apify_instagram_scraper",
+        "gerado_em":           datetime.now().strftime("%Y-%m-%d"),
+        "fonte":               "google_trends_brasil",
+        "periodo":             "ultimo_mes",
         "proxima_atualizacao": "automatica_via_github_actions",
-        "score_corte": SCORE_CORTE,
-        "posts_analisados_total": total,
-        "posts_classificados": classificados,
-        "temas_em_alta": temas,
-        "temas_emergentes": top_outros,
+        "score_corte":         SCORE_CORTE,
+        "temas_em_alta":       temas,
     }
 
     with open(OUTPUT_JSON, "w", encoding="utf-8") as f:
         json.dump(output, f, ensure_ascii=False, indent=2)
 
-    print(f"\n✅ {len(temas)} temas salvos")
+    print(f"\n✅ {len(temas)} temas salvos em dados/temas_em_alta.json")
 
 
 if __name__ == "__main__":
