@@ -26,7 +26,7 @@ jobs:
           python-version: '3.11'
 
       - name: Instalar dependencias
-        run: pip install pytrends
+        run: pip install pytrends "urllib3<2"
 
       - name: Executar analise Google Trends
         run: python scripts/analise_concorrencia.py
