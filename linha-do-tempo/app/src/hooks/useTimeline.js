@@ -1,24 +1,32 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 
 export function useTimelines(userId) {
   const [timelines, setTimelines] = useState([])
-  const [carregando, setCarregando] = useState(true)
+  const [carregando, setCarregando] = useState(!!userId)
   const [erro, setErro] = useState(null)
+  const [tick, setTick] = useState(0)
 
-  const carregar = useCallback(async () => {
+  useEffect(() => {
     if (!userId) return
-    setCarregando(true)
-    const { data, error } = await supabase
+    let ativo = true
+    supabase
       .from('timelines')
       .select('*')
       .order('created_at', { ascending: false })
-    if (error) setErro(error.message)
-    else setTimelines(data || [])
-    setCarregando(false)
-  }, [userId])
+      .then(({ data, error }) => {
+        if (!ativo) return
+        if (error) setErro(error.message)
+        else setTimelines(data || [])
+        setCarregando(false)
+      })
+    return () => { ativo = false }
+  }, [userId, tick])
 
-  useEffect(() => { carregar() }, [carregar])
+  const recarregar = () => {
+    setCarregando(true)
+    setTick(t => t + 1)
+  }
 
   async function criar(dados) {
     const { data, error } = await supabase
@@ -37,17 +45,27 @@ export function useTimelines(userId) {
     setTimelines(prev => prev.filter(t => t.id !== id))
   }
 
-  return { timelines, carregando, erro, criar, excluir, recarregar: carregar }
+  return { timelines, carregando, erro, criar, excluir, recarregar }
 }
 
 export function useTimelineEditor(id) {
   const [timeline, setTimeline] = useState(null)
-  const [carregando, setCarregando] = useState(true)
+  const [carregando, setCarregando] = useState(!!id)
 
   useEffect(() => {
     if (!id) return
-    supabase.from('timelines').select('*').eq('id', id).single()
-      .then(({ data }) => { setTimeline(data); setCarregando(false) })
+    let ativo = true
+    supabase
+      .from('timelines')
+      .select('*')
+      .eq('id', id)
+      .single()
+      .then(({ data }) => {
+        if (!ativo) return
+        setTimeline(data)
+        setCarregando(false)
+      })
+    return () => { ativo = false }
   }, [id])
 
   async function atualizar(campos) {
