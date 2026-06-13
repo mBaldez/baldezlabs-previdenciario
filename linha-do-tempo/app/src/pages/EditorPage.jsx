@@ -10,6 +10,7 @@ import { SecaoVinculosUrbanos } from '../components/editor/secoes/SecaoVinculosU
 import { SecaoProvasRetorno } from '../components/editor/secoes/SecaoProvasRetorno'
 import { SecaoIRs } from '../components/editor/secoes/SecaoIRs'
 import { SecaoIncapacidade } from '../components/editor/secoes/SecaoIncapacidade'
+import { ModeloHorizontal } from '../components/editor/visualizacao/ModeloHorizontal'
 
 export function EditorPage() {
   const { id } = useParams()
@@ -156,12 +157,24 @@ export function EditorPage() {
         }}>
           <div style={{
             background: 'white', borderRadius: '8px',
-            padding: '24px', minHeight: '400px',
+            padding: '16px', minHeight: '300px',
             boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
           }}>
-            <p style={{ color: '#999', fontStyle: 'italic' }}>
-              View: <strong>{viewAtiva}</strong> — Visualizacoes serao implementadas nas Tasks 9-11.
-            </p>
+            {viewAtiva === 'timeline' && modeloVisual === 'horizontal' && (
+              <ModeloHorizontal
+                timeline={timeline}
+                vinculos={vinculos}
+                provas={provas}
+                irs={irs}
+                incapacidades={incapacidades}
+              />
+            )}
+            {!(viewAtiva === 'timeline' && modeloVisual === 'horizontal') && (
+              <p style={{ color: '#999', fontStyle: 'italic' }}>
+                View: <strong>{viewAtiva}</strong> / Modelo: <strong>{modeloVisual}</strong>
+                {' '}&mdash; Implementado nas Tasks 10-11.
+              </p>
+            )}
           </div>
         </main>
       </div>
