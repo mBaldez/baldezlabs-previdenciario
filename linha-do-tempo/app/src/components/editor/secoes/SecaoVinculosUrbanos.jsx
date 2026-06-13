@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { MonthYearPicker } from '../../ui/MonthYearPicker'
 import { Button } from '../../ui/Button'
 import { Modal } from '../../ui/Modal'
+import { parsearCnis } from '../../../lib/cnis-parser'
 
 const FORM_VAZIO = { origem: '', inicio_mes: 1, inicio_ano: 2015, fim_mes: 12, fim_ano: 2016 }
 
@@ -9,6 +10,7 @@ export function SecaoVinculosUrbanos({ vinculos, onAdicionar, onRemover }) {
   const [form, setForm] = useState(FORM_VAZIO)
   const [modalCnis, setModalCnis] = useState(false)
   const [arquivoCnis, setArquivoCnis] = useState(null)
+  const [carregandoCnis, setCarregandoCnis] = useState(false)
 
   async function handleAdicionar(e) {
     e.preventDefault()
@@ -17,13 +19,27 @@ export function SecaoVinculosUrbanos({ vinculos, onAdicionar, onRemover }) {
     setForm(FORM_VAZIO)
   }
 
-  function handleUploadCnis() {
+  async function handleUploadCnis() {
     if (!arquivoCnis) return
-    // Parser CNIS será implementado na Task 13
-    console.log('CNIS upload — Task 13:', arquivoCnis.name)
-    alert('Parser CNIS será implementado na Task 13.')
-    setModalCnis(false)
-    setArquivoCnis(null)
+    setCarregandoCnis(true)
+    try {
+      const vinculos = await parsearCnis(arquivoCnis)
+      if (vinculos.length === 0) {
+        alert('CNIS reconhecido, mas nenhum vínculo foi extraído automaticamente. Cadastre manualmente.')
+      } else {
+        for (const v of vinculos) {
+          await onAdicionar(v)
+        }
+        alert(`${vinculos.length} vínculo(s) extraído(s) do CNIS com sucesso!`)
+      }
+    } catch (err) {
+      console.error('Erro CNIS:', err)
+      alert(err.message)
+    } finally {
+      setCarregandoCnis(false)
+      setModalCnis(false)
+      setArquivoCnis(null)
+    }
   }
 
   const labelStyle = { color: 'rgba(255,255,255,0.8)', fontSize: '13px', display: 'block', marginBottom: '4px' }
@@ -113,8 +129,8 @@ export function SecaoVinculosUrbanos({ vinculos, onAdicionar, onRemover }) {
           <Button variant="secondary" onClick={() => { setModalCnis(false); setArquivoCnis(null) }}>
             Cancelar
           </Button>
-          <Button onClick={handleUploadCnis} disabled={!arquivoCnis}>
-            Salvar
+          <Button onClick={handleUploadCnis} disabled={!arquivoCnis || carregandoCnis}>
+            {carregandoCnis ? 'Processando...' : 'Salvar'}
           </Button>
         </div>
       </Modal>
