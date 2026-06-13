@@ -32,7 +32,7 @@ CATEGORIAS_HASHTAGS = {
 
 SCORE_CORTE = 8.6
 
-APIFY_ACTOR = "apify~instagram-profile-scraper"
+APIFY_ACTOR = "apify~instagram-scraper"
 APIFY_RUN_URL = f"https://api.apify.com/v2/acts/{APIFY_ACTOR}/run-sync-get-dataset-items"
 
 
@@ -51,12 +51,16 @@ def coletar_via_apify(usernames: list, token: str) -> list:
     Timeout de 5 minutos — suficiente para 10 perfis × 30 posts.
     """
     print(f"🌐 Chamando Apify para {len(usernames)} perfis...")
+    # Monta lista de URLs dos perfis
+    urls = [f"https://www.instagram.com/{u}/" for u in usernames]
+
     try:
         resp = requests.post(
             APIFY_RUN_URL,
             params={"token": token},
             json={
-                "usernames": usernames,
+                "directUrls": urls,
+                "resultsType": "posts",
                 "resultsLimit": 30,
             },
             timeout=300,  # 5 minutos
