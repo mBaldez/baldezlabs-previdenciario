@@ -3,51 +3,27 @@
   "fonte": "apify_instagram_scraper",
   "proxima_atualizacao": "automatica_via_github_actions",
   "score_corte": 8.6,
+  "posts_analisados_total": 200,
+  "posts_classificados": 9,
   "temas_em_alta": [
     {
       "tema": "BPC / LOAS",
       "area": "BPC",
-      "score_estimado": 6.8,
-      "motivo": "9 posts analisados · média 1872 likes · 1 perfis abordaram o tema",
+      "score_estimado": 6.4,
+      "motivo": "6 posts · mediana 521 likes · 1 perfis abordaram",
       "hashtags_relacionadas": [
-        "#bpcloas",
         "#inss",
         "#direitoprevidenciário",
+        "#bpcloas",
         "#loas",
-        "#bpc"
-      ]
-    },
-    {
-      "tema": "Aposentadoria Especial",
-      "area": "AE",
-      "score_estimado": 6.5,
-      "motivo": "3 posts analisados · média 790 likes · 2 perfis abordaram o tema",
-      "hashtags_relacionadas": [
-        "#aposentadoriaespecial",
-        "#inss",
-        "#direitoprevidenciario",
-        "#adi6309",
-        "#stf"
-      ]
-    },
-    {
-      "tema": "Salário Maternidade",
-      "area": "SM",
-      "score_estimado": 5.9,
-      "motivo": "1 posts analisados · média 1117 likes · 1 perfis abordaram o tema",
-      "hashtags_relacionadas": [
-        "#saláriomaternidade",
-        "#inss",
-        "#gestante",
-        "#maternidade",
-        "#direitoprevidenciário"
+        "#autismo"
       ]
     },
     {
       "tema": "Aposentadoria Rural",
       "area": "AR",
       "score_estimado": 5.9,
-      "motivo": "1 posts analisados · média 59587 likes · 1 perfis abordaram o tema",
+      "motivo": "1 posts · mediana 59596 likes · 1 perfis abordaram",
       "hashtags_relacionadas": [
         "#agricultor",
         "#aposentadoriarural",
@@ -56,10 +32,23 @@
       ]
     },
     {
+      "tema": "Aposentadoria Especial",
+      "area": "AE",
+      "score_estimado": 5.9,
+      "motivo": "1 posts · mediana 1230 likes · 1 perfis abordaram",
+      "hashtags_relacionadas": [
+        "#aposentadoriaespecial",
+        "#adi6309",
+        "#stf",
+        "#direitoprevidenciário",
+        "#inss"
+      ]
+    },
+    {
       "tema": "Auxílio Acidente",
       "area": "AA",
       "score_estimado": 3.0,
-      "motivo": "1 posts analisados · média 41 likes · 1 perfis abordaram o tema",
+      "motivo": "1 posts · mediana 41 likes · 1 perfis abordaram",
       "hashtags_relacionadas": [
         "#auxilioacidente",
         "#inss",
@@ -68,5 +57,18 @@
         "#aposentadoria"
       ]
     }
+  ],
+  "temas_emergentes": [
+    "#aposentadoria",
+    "#advogada",
+    "#direitos",
+    "#advocaciaprevidenciaria",
+    "#direitoprevidenciario",
+    "#justiça",
+    "#notícias",
+    "#advogadaprevidenciarista",
+    "#fabioturazza",
+    "#pericia",
+    "#direitoprevidenciário"
   ]
 }
