@@ -1,9 +1,15 @@
-import { useState, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useParams } from 'react-router-dom'
 import { useTimelineEditor } from '../hooks/useTimeline'
 import { useAutosave } from '../hooks/useAutosave'
+import { supabase } from '../lib/supabase'
 import { EditorToolbar } from '../components/editor/EditorToolbar'
 import { Sidebar } from '../components/editor/Sidebar'
+import { SecaoAtividadeRural } from '../components/editor/secoes/SecaoAtividadeRural'
+import { SecaoVinculosUrbanos } from '../components/editor/secoes/SecaoVinculosUrbanos'
+import { SecaoProvasRetorno } from '../components/editor/secoes/SecaoProvasRetorno'
+import { SecaoIRs } from '../components/editor/secoes/SecaoIRs'
+import { SecaoIncapacidade } from '../components/editor/secoes/SecaoIncapacidade'
 
 export function EditorPage() {
   const { id } = useParams()
@@ -11,6 +17,62 @@ export function EditorPage() {
   const [salvando, setSalvando] = useState(false)
   const [viewAtiva, setViewAtiva] = useState('timeline')
   const [modeloVisual, setModeloVisual] = useState('horizontal')
+
+  // Estado das tabelas filhas
+  const [vinculos, setVinculos] = useState([])
+  const [provas, setProvas] = useState([])
+  const [irs, setIrs] = useState([])
+  const [incapacidades, setIncapacidades] = useState([])
+
+  // Carregar dados filhos quando timeline carregada
+  useEffect(() => {
+    if (!id) return
+    supabase.from('vinculos_urbanos').select('*').eq('timeline_id', id).order('inicio_ano').then(({ data }) => setVinculos(data || []))
+    supabase.from('provas_retorno').select('*').eq('timeline_id', id).order('data_ano').then(({ data }) => setProvas(data || []))
+    supabase.from('instrumentos_ratificadores').select('*').eq('timeline_id', id).order('data_ano').then(({ data }) => setIrs(data || []))
+    supabase.from('beneficios_incapacidade').select('*').eq('timeline_id', id).order('inicio_ano').then(({ data }) => setIncapacidades(data || []))
+  }, [id])
+
+  // Funções CRUD para cada tabela filha
+  async function adicionarVinculo(dados) {
+    const { data, error } = await supabase.from('vinculos_urbanos').insert({ ...dados, timeline_id: id }).select().single()
+    if (error) throw error
+    setVinculos(prev => [...prev, data])
+  }
+  async function removerVinculo(vinculoId) {
+    await supabase.from('vinculos_urbanos').delete().eq('id', vinculoId)
+    setVinculos(prev => prev.filter(v => v.id !== vinculoId))
+  }
+
+  async function adicionarProva(dados) {
+    const { data, error } = await supabase.from('provas_retorno').insert({ ...dados, timeline_id: id }).select().single()
+    if (error) throw error
+    setProvas(prev => [...prev, data])
+  }
+  async function removerProva(provaId) {
+    await supabase.from('provas_retorno').delete().eq('id', provaId)
+    setProvas(prev => prev.filter(p => p.id !== provaId))
+  }
+
+  async function adicionarIR(dados) {
+    const { data, error } = await supabase.from('instrumentos_ratificadores').insert({ ...dados, timeline_id: id }).select().single()
+    if (error) throw error
+    setIrs(prev => [...prev, data])
+  }
+  async function removerIR(irId) {
+    await supabase.from('instrumentos_ratificadores').delete().eq('id', irId)
+    setIrs(prev => prev.filter(ir => ir.id !== irId))
+  }
+
+  async function adicionarIncapacidade(dados) {
+    const { data, error } = await supabase.from('beneficios_incapacidade').insert({ ...dados, timeline_id: id }).select().single()
+    if (error) throw error
+    setIncapacidades(prev => [...prev, data])
+  }
+  async function removerIncapacidade(incId) {
+    await supabase.from('beneficios_incapacidade').delete().eq('id', incId)
+    setIncapacidades(prev => prev.filter(i => i.id !== incId))
+  }
 
   // Autosave ao mudar modeloVisual
   const salvarModelo = useCallback(async (modelo) => {
@@ -44,13 +106,28 @@ export function EditorPage() {
     </div>
   )
 
-  // Secoes do sidebar (placeholders -- serao preenchidas na Task 8)
+  // Secoes do sidebar
   const secoes = [
-    { titulo: 'Exercicio da Atividade Rural', conteudo: <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '13px' }}>Em construcao (Task 8)</p> },
-    { titulo: 'Vinculos Urbanos', conteudo: <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '13px' }}>Em construcao (Task 8)</p> },
-    { titulo: 'Provas de Retorno', conteudo: <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '13px' }}>Em construcao (Task 8)</p> },
-    { titulo: 'Instrumentos Ratificadores', conteudo: <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '13px' }}>Em construcao (Task 8)</p> },
-    { titulo: 'Beneficio por Incapacidade', conteudo: <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '13px' }}>Em construcao (Task 8)</p> },
+    {
+      titulo: 'Exercício da Atividade Rural',
+      conteudo: <SecaoAtividadeRural timeline={timeline} onAtualizar={async (campos) => { setSalvando(true); await atualizar(campos); setSalvando(false) }} />
+    },
+    {
+      titulo: 'Vínculos Urbanos',
+      conteudo: <SecaoVinculosUrbanos vinculos={vinculos} onAdicionar={adicionarVinculo} onRemover={removerVinculo} />
+    },
+    {
+      titulo: 'Provas de Retorno',
+      conteudo: <SecaoProvasRetorno provas={provas} onAdicionar={adicionarProva} onRemover={removerProva} />
+    },
+    {
+      titulo: 'Instrumentos Ratificadores',
+      conteudo: <SecaoIRs irs={irs} onAdicionar={adicionarIR} onRemover={removerIR} />
+    },
+    {
+      titulo: 'Benefício por Incapacidade',
+      conteudo: <SecaoIncapacidade incapacidades={incapacidades} onAdicionar={adicionarIncapacidade} onRemover={removerIncapacidade} />
+    },
   ]
 
   return (
