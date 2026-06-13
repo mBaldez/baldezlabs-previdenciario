@@ -14,12 +14,13 @@ BASE_DIR    = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUTPUT_JSON = os.path.join(BASE_DIR, "dados", "temas_em_alta.json")
 
 TERMOS_PRINCIPAIS = {
-    "BPC": "BPC autismo",
+    "BPC": "BPC autismo", 
     "SM":  "salario maternidade INSS",
     "AR":  "aposentadoria rural",
     "AE":  "aposentadoria especial",
     "PM":  "pensao por morte",
     "AI":  "aposentadoria por invalidez",
+    "AX":  "auxilio-acidente"
 }
 
 NOMES = {
@@ -29,15 +30,17 @@ NOMES = {
     "AE":  "Aposentadoria Especial",
     "PM":  "Pensao por Morte",
     "AI":  "Aposentadoria por Invalidez",
+    "Ax":  "Auxilio-Acidente"
 }
 
 HASHTAGS = {
-    "BPC": ["#bpc", "#autismo", "#tea", "#loas", "#direitoprevidenciario"],
+    "BPC": ["#bpc", "#autismo", "#bpcidoso", "#loas", "nivel 1", "#direitoprevidenciario"],
     "SM":  ["#salariomaternidade", "#maternidade", "#mei", "#inss", "#direitoprevidenciario"],
     "AR":  ["#aposentadoriarural", "#seguidorespecial", "#trabalhadorarural", "#inss"],
     "AE":  ["#aposentadoriaespecial", "#insalubre", "#tempoespecial", "#inss"],
     "PM":  ["#pensaopormorte", "#inss", "#dependente", "#direitosprevidenciarios"],
     "AI":  ["#aposentadoriainvalidez", "#auxiliodoenca", "#inss", "#direitoprevidenciario"],
+    "AX":  ["acidente", "lesão", "incapacidade", "pino","limitação movimento", "dor laboral"]
 }
 
 ANGULO = {
@@ -47,6 +50,7 @@ ANGULO = {
     "AE":  "Profissionais de saude e construcao civil sao nichos de alto valor - foque em casos reais",
     "PM":  "Alta carga emocional - conteudo empatico sobre prazos e documentos gera confianca",
     "AI":  "Pessoas em sofrimento buscam esperanca - linguagem acolhedora + orientacao pratica",
+    "AX":  "Pessoas com limitações para o trabalho, frágeis, sem esperança - toque a dor, va direto ao ponto"
 }
 
 SCORE_CORTE = 6.0
