@@ -6,70 +6,12 @@
   "score_corte": 6.0,
   "temas_em_alta": [
     {
-      "tema": "BPC / LOAS",
-      "area": "BPC",
-      "termo_pesquisado": "BPC autismo",
-      "interesse_google": 85,
-      "score_estimado": 8.5,
-      "angulo_conteudo": "Muitas familias nao sabem que tem direito — explique os criterios de forma simples",
-      "hashtags_relacionadas": [
-        "#bpc",
-        "#autismo",
-        "#tea",
-        "#loas",
-        "#direitoprevidenciario"
-      ]
-    },
-    {
-      "tema": "Aposentadoria Rural",
-      "area": "AR",
-      "termo_pesquisado": "aposentadoria rural",
-      "interesse_google": 78,
-      "score_estimado": 7.8,
-      "angulo_conteudo": "Documentacao e a maior dificuldade — roteiros de 'o que preciso juntar' tem alto alcance",
-      "hashtags_relacionadas": [
-        "#aposentadoriarural",
-        "#seguidorespecial",
-        "#trabalhadorarural",
-        "#inss"
-      ]
-    },
-    {
-      "tema": "Salario Maternidade",
-      "area": "SM",
-      "termo_pesquisado": "salario maternidade INSS",
-      "interesse_google": 72,
-      "score_estimado": 7.2,
-      "angulo_conteudo": "MEIs e autonomas tem duvidas frequentes — conteudo pratico converte muito",
-      "hashtags_relacionadas": [
-        "#salariomaternidade",
-        "#maternidade",
-        "#mei",
-        "#inss",
-        "#direitoprevidenciario"
-      ]
-    },
-    {
-      "tema": "Aposentadoria por Invalidez",
-      "area": "AI",
-      "termo_pesquisado": "aposentadoria por invalidez",
-      "interesse_google": 66,
-      "score_estimado": 6.6,
-      "angulo_conteudo": "Pessoas em sofrimento buscam esperanca — linguagem acolhedora + orientacao pratica",
-      "hashtags_relacionadas": [
-        "#aposentadoriainvalidez",
-        "#auxiliodoenca",
-        "#inss",
-        "#direitoprevidenciario"
-      ]
-    },
-    {
       "tema": "Pensao por Morte",
       "area": "PM",
       "termo_pesquisado": "pensao por morte",
-      "interesse_google": 65,
-      "score_estimado": 6.5,
-      "angulo_conteudo": "Alta carga emocional — conteudo empatico sobre prazos e documentos gera confianca",
+      "interesse_google": 69,
+      "score_estimado": 6.9,
+      "angulo_conteudo": "Alta carga emocional - conteudo empatico sobre prazos e documentos gera confianca",
       "hashtags_relacionadas": [
         "#pensaopormorte",
         "#inss",
@@ -78,17 +20,31 @@
       ]
     },
     {
-      "tema": "Aposentadoria Especial",
-      "area": "AE",
-      "termo_pesquisado": "aposentadoria especial",
-      "interesse_google": 61,
-      "score_estimado": 6.1,
-      "angulo_conteudo": "Profissionais de saude e construcao civil sao nichos de alto valor — foque em casos reais",
+      "tema": "Aposentadoria Rural",
+      "area": "AR",
+      "termo_pesquisado": "aposentadoria rural",
+      "interesse_google": 66,
+      "score_estimado": 6.6,
+      "angulo_conteudo": "Documentacao e a maior dificuldade - roteiros de 'o que preciso juntar' tem alto alcance",
       "hashtags_relacionadas": [
-        "#aposentadoriaespecial",
-        "#insalubre",
-        "#tempoespecial",
+        "#aposentadoriarural",
+        "#seguidorespecial",
+        "#trabalhadorarural",
         "#inss"
+      ]
+    },
+    {
+      "tema": "Aposentadoria por Invalidez",
+      "area": "AI",
+      "termo_pesquisado": "aposentadoria por invalidez",
+      "interesse_google": 66,
+      "score_estimado": 6.6,
+      "angulo_conteudo": "Pessoas em sofrimento buscam esperanca - linguagem acolhedora + orientacao pratica",
+      "hashtags_relacionadas": [
+        "#aposentadoriainvalidez",
+        "#auxiliodoenca",
+        "#inss",
+        "#direitoprevidenciario"
       ]
     }
   ]
