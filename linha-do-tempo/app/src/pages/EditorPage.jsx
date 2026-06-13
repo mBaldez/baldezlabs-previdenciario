@@ -10,7 +10,10 @@ import { SecaoVinculosUrbanos } from '../components/editor/secoes/SecaoVinculosU
 import { SecaoProvasRetorno } from '../components/editor/secoes/SecaoProvasRetorno'
 import { SecaoIRs } from '../components/editor/secoes/SecaoIRs'
 import { SecaoIncapacidade } from '../components/editor/secoes/SecaoIncapacidade'
-import { ModeloHorizontal } from '../components/editor/visualizacao/ModeloHorizontal'
+import { ViewLinhaDoTempo } from '../components/editor/views/ViewLinhaDoTempo'
+import { ViewDescreverIRs } from '../components/editor/views/ViewDescreverIRs'
+import { ViewDescreverVinculos } from '../components/editor/views/ViewDescreverVinculos'
+import { ViewRelatorio } from '../components/editor/views/ViewRelatorio'
 
 export function EditorPage() {
   const { id } = useParams()
@@ -86,9 +89,35 @@ export function EditorPage() {
 
   useAutosave(modeloVisual, salvarModelo)
 
-  function handleExportar() {
-    // Sera implementado na Task 12
-    alert('Export sera implementado na Task 12.')
+  async function handleExportar() {
+    try {
+      const { default: html2canvas } = await import('html2canvas')
+      const elemento = document.getElementById('area-timeline')
+      if (!elemento) {
+        alert('Nenhuma timeline visível para exportar. Selecione a view "Linha do Tempo".')
+        return
+      }
+      const canvas = await html2canvas(elemento, {
+        backgroundColor: '#ffffff',
+        scale: 2,
+        useCORS: true,
+      })
+      const url = canvas.toDataURL('image/png')
+      const novaAba = window.open()
+      novaAba.document.write(`
+        <html><head><title>Linha do Tempo — ${timeline.nome_cliente}</title></head>
+        <body style="margin:0;background:#f5f5f5;display:flex;flex-direction:column;align-items:center;padding:20px;font-family:Georgia,serif;">
+          <p style="margin-bottom:12px;color:#555;">
+            Você pode copiar a imagem abaixo ou
+            <a href="${url}" download="linha-do-tempo-${timeline.nome_cliente.replace(/\s+/g, '-')}.png"
+               style="color:#C9A84C;font-weight:bold;">fazer download clicando aqui</a>.
+          </p>
+          <img src="${url}" style="max-width:100%;box-shadow:0 4px 16px rgba(0,0,0,0.2);border-radius:4px;" />
+        </body></html>
+      `)
+    } catch (err) {
+      alert('Erro ao exportar: ' + err.message)
+    }
   }
 
   if (carregando) return (
@@ -157,23 +186,38 @@ export function EditorPage() {
         }}>
           <div style={{
             background: 'white', borderRadius: '8px',
-            padding: '16px', minHeight: '300px',
+            padding: '20px', minHeight: '400px',
             boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
           }}>
-            {viewAtiva === 'timeline' && modeloVisual === 'horizontal' && (
-              <ModeloHorizontal
+            {viewAtiva === 'timeline' && (
+              <ViewLinhaDoTempo
                 timeline={timeline}
                 vinculos={vinculos}
                 provas={provas}
                 irs={irs}
                 incapacidades={incapacidades}
+                modeloVisual={modeloVisual}
               />
             )}
-            {!(viewAtiva === 'timeline' && modeloVisual === 'horizontal') && (
-              <p style={{ color: '#999', fontStyle: 'italic' }}>
-                View: <strong>{viewAtiva}</strong> / Modelo: <strong>{modeloVisual}</strong>
-                {' '}&mdash; Implementado nas Tasks 10-11.
-              </p>
+            {viewAtiva === 'irs' && (
+              <ViewDescreverIRs
+                timeline={timeline}
+                onSalvar={async (campos) => { setSalvando(true); await atualizar(campos); setSalvando(false) }}
+              />
+            )}
+            {viewAtiva === 'vinculos' && (
+              <ViewDescreverVinculos
+                timeline={timeline}
+                onSalvar={async (campos) => { setSalvando(true); await atualizar(campos); setSalvando(false) }}
+              />
+            )}
+            {viewAtiva === 'relatorio' && (
+              <ViewRelatorio
+                timeline={timeline}
+                vinculos={vinculos}
+                provas={provas}
+                irs={irs}
+              />
             )}
           </div>
         </main>
