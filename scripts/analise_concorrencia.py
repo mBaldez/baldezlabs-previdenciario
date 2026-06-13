@@ -34,7 +34,7 @@ CATEGORIAS_HASHTAGS = {
 SCORE_CORTE = 8.6
 
 APIFY_ACTOR = "apify~instagram-scraper"
-APIFY_RUN_URL = f"https://api.apify.com/v2/acts/{APIFY_ACTOR}/run-sync-get-dataset-items"
+APIFY_BASE_URL = f"https://api.apify.com/v2/acts/{APIFY_ACTOR}"
 
 
 def carregar_perfis() -> list:
@@ -167,6 +167,9 @@ def processar_posts(items: list, num_perfis: int) -> list:
     temas_ordenados = sorted(temas, key=lambda x: x["score_estimado"], reverse=True)
 
     # Diagnóstico
+    top_outros = [f"#{t}" for t, c in Counter(hashtags_outros).most_common(15)
+                  if len(t) > 4 and t not in ("inss","previdencia","advogado","direito","brasil")]
+
     print("\n📊 Scores detectados:")
     for t in temas_ordenados:
         flag = "✅" if t["score_estimado"] >= SCORE_CORTE else "  "
@@ -175,7 +178,7 @@ def processar_posts(items: list, num_perfis: int) -> list:
 
     # Sempre retorna top 6 (nunca vazio); aplica corte só se houver temas acima dele
     acima_corte = [t for t in temas_ordenados if t["score_estimado"] >= SCORE_CORTE]
-    return acima_corte if acima_corte else temas_ordenados[:6]
+    return (acima_corte if acima_corte else temas_ordenados[:6]), top_outros
 
 
 def main():
@@ -192,11 +195,7 @@ def main():
     perfis = carregar_perfis()
     items  = coletar_via_apify(perfis, token)
 
-    temas = processar_posts(items, len(perfis))
-
-    # Top hashtags de posts não classificados = temas emergentes a explorar
-    top_outros = [f"#{t}" for t, c in Counter(hashtags_outros).most_common(15)
-                  if len(t) > 4 and t not in ("inss","previdencia","advogado","direito","brasil")]
+    temas, top_outros = processar_posts(items, len(perfis))
 
     output = {
         "gerado_em": datetime.now().strftime("%Y-%m-%d"),
