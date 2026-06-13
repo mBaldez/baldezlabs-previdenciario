@@ -221,6 +221,15 @@
       .metrics-grid{grid-template-columns:repeat(2,1fr)}
     }
 
+
+    /* ── TEMAS EMERGENTES ── */
+    .emergentes-box{background:var(--navy-mid);border:1px solid var(--border);border-radius:var(--radius-md);padding:14px 16px;margin-top:1.5rem;}
+    .emergentes-title{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-dim);margin-bottom:10px;}
+    .emergentes-tags{display:flex;flex-wrap:wrap;gap:6px;}
+    .emergentes-tag{font-size:.72rem;color:var(--text-second);background:rgba(255,255,255,.04);border:1px solid var(--border);padding:3px 10px;border-radius:100px;cursor:pointer;transition:border-color .15s,color .15s;}
+    .emergentes-tag:hover{border-color:var(--border-gold);color:var(--gold);}
+    .emergentes-note{font-size:.7rem;color:var(--text-dim);margin-top:8px;font-style:italic;}
+
     /* ── TEMAS EM ALTA (dinâmico) ── */
     .trend-header-bar{background:var(--navy-mid);border:1px solid var(--border-gold);border-radius:var(--radius-md);padding:10px 16px;margin-bottom:1.25rem;display:flex;align-items:center;justify-content:space-between;font-size:.75rem;color:var(--text-second);flex-wrap:wrap;gap:6px;}
     .trend-update-date{color:var(--gold);font-weight:700;}
@@ -1400,7 +1409,31 @@ function renderTendencias(data) {
     container.innerHTML = '<div class="trend-empty">Nenhum tema em alta registrado ainda.</div>';
     return;
   }
-  container.innerHTML = '<div class="trend-cards">' + temas.map(function(t) {
+  // Temas emergentes
+  var emerg = data.temas_emergentes || [];
+  var emergHTML = '';
+  if (emerg.length) {
+    emergHTML = '<div class="emergentes-box">' +
+      '<div class="emergentes-title">🔎 Temas emergentes detectados fora das categorias mapeadas</div>' +
+      '<div class="emergentes-tags">' +
+        emerg.map(function(t){ return '<span class="emergentes-tag" onclick="navigator.clipboard.writeText(\'' + t + '\')">' + t + '</span>'; }).join('') +
+      '</div>' +
+      '<div class="emergentes-note">Clique para copiar · Pode indicar nichos não explorados ainda</div>' +
+    '</div>';
+  }
+
+  // Estatísticas
+  var statsHTML = '';
+  if (data.posts_analisados_total) {
+    var pct = data.posts_classificados ? Math.round((data.posts_classificados / data.posts_analisados_total) * 100) : 0;
+    statsHTML = '<div style="font-size:.7rem;color:var(--text-dim);margin-bottom:1rem;">' +
+      '📊 ' + data.posts_analisados_total + ' posts analisados · ' +
+      data.posts_classificados + ' classificados (' + pct + '%) · ' +
+      (data.posts_analisados_total - (data.posts_classificados||0)) + ' em temas emergentes' +
+    '</div>';
+  }
+
+  container.innerHTML = statsHTML + '<div class="trend-cards">' + temas.map(function(t) {
     const areaLabel = AREA_LABELS_FULL[t.area] || t.area;
     const pct = Math.min(100, (t.score_estimado / 10) * 100).toFixed(0);
     const hashtags = (t.hashtags_relacionadas || []);
@@ -1416,7 +1449,7 @@ function renderTendencias(data) {
       '<div class="trend-hashtags">' + hashtags.map(function(h){return '<span class="trend-hashtag">'+h+'</span>';}).join('') + '</div>' +
       '<button class="trend-btn-copy" data-hash="' + hashStr + '">📋 Copiar hashtags</button>' +
     '</div>';
-  }).join('') + '</div>';
+  }).join('') + '</div>' + emergHTML;
   container.querySelectorAll('.trend-btn-copy').forEach(function(btn) {
     btn.addEventListener('click', function() {
       navigator.clipboard.writeText(this.dataset.hash).then(function() {

@@ -15,6 +15,7 @@ import json
 import os
 import time
 import requests
+import statistics
 from datetime import datetime
 from collections import Counter
 
@@ -106,6 +107,7 @@ def calcular_score(likes_total, posts, frequencia, num_perfis) -> float:
         return 0.0
     media_likes    = likes_total / posts
     likes_score    = min(media_likes / 150, 1.0) * 4.0   # benchmark 150 likes
+    # Nota: quem chama pode passar mediana em vez de média para evitar distorção viral
     freq_score     = (frequencia / num_perfis) * 3.5
     saturacao      = frequencia / num_perfis
     sat_bonus      = (1 - saturacao) * 1.5 if saturacao > 0.5 else 1.5
@@ -117,22 +119,25 @@ def processar_posts(items: list, num_perfis: int) -> list:
     """Processa a resposta da Apify e calcula scores por área."""
     por_area = {}
 
+    hashtags_outros = []   # hashtags de posts não classificados
+
     for item in items:
-        caption = item.get("caption") or item.get("alt") or ""
-        likes   = item.get("likesCount") or item.get("likes") or 0
-        owner   = item.get("ownerUsername") or item.get("username") or ""
+        caption  = item.get("caption") or item.get("alt") or ""
+        likes    = item.get("likesCount") or item.get("likes") or 0
+        owner    = item.get("ownerUsername") or item.get("username") or ""
         hashtags = analisar_hashtags(caption)
-        area = classificar_tema(hashtags)
+        area     = classificar_tema(hashtags)
 
         if area == "OUTROS":
+            hashtags_outros.extend(hashtags)
             continue
 
         if area not in por_area:
-            por_area[area] = {"posts": 0, "likes": 0, "hashtags": [], "perfis": set()}
+            por_area[area] = {"posts": 0, "likes_lista": [], "hashtags": [], "perfis": set()}
 
-        por_area[area]["posts"]    += 1
-        por_area[area]["likes"]    += likes
-        por_area[area]["hashtags"] += hashtags
+        por_area[area]["posts"]       += 1
+        por_area[area]["likes_lista"].append(likes)
+        por_area[area]["hashtags"]    += hashtags
         por_area[area]["perfis"].add(owner)
 
     NOMES_AREAS = {
@@ -166,6 +171,7 @@ def processar_posts(items: list, num_perfis: int) -> list:
     for t in temas_ordenados:
         flag = "✅" if t["score_estimado"] >= SCORE_CORTE else "  "
         print(f"   {flag} {t['area']}: {t['score_estimado']} — {t['motivo']}")
+    print(f"\n🔎 Posts não classificados: {len(hashtags_outros)} hashtags → top emergentes: {top_outros[:5]}")
 
     # Sempre retorna top 6 (nunca vazio); aplica corte só se houver temas acima dele
     acima_corte = [t for t in temas_ordenados if t["score_estimado"] >= SCORE_CORTE]
@@ -188,12 +194,19 @@ def main():
 
     temas = processar_posts(items, len(perfis))
 
+    # Top hashtags de posts não classificados = temas emergentes a explorar
+    top_outros = [f"#{t}" for t, c in Counter(hashtags_outros).most_common(15)
+                  if len(t) > 4 and t not in ("inss","previdencia","advogado","direito","brasil")]
+
     output = {
         "gerado_em": datetime.now().strftime("%Y-%m-%d"),
         "fonte": "apify_instagram_scraper",
         "proxima_atualizacao": "automatica_via_github_actions",
         "score_corte": SCORE_CORTE,
         "temas_em_alta": temas,
+        "temas_emergentes": top_outros,
+        "posts_analisados_total": len(items),
+        "posts_classificados": sum(d["posts"] for d in por_area.values()),
     }
 
     with open(OUTPUT_JSON, "w", encoding="utf-8") as f:
