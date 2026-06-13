@@ -233,23 +233,43 @@
     /* ── TEMAS EM ALTA (dinâmico) ── */
     .trend-header-bar{background:var(--navy-mid);border:1px solid var(--border-gold);border-radius:var(--radius-md);padding:10px 16px;margin-bottom:1.25rem;display:flex;align-items:center;justify-content:space-between;font-size:.75rem;color:var(--text-second);flex-wrap:wrap;gap:6px;}
     .trend-update-date{color:var(--gold);font-weight:700;}
+    /* Pie chart section */
+    .trend-pie-wrap{display:flex;align-items:center;gap:2rem;background:var(--navy-mid);border:1px solid var(--border-gold);border-radius:var(--radius-md);padding:1.25rem 1.5rem;margin-bottom:1.5rem;flex-wrap:wrap;}
+    .trend-pie-canvas-wrap{position:relative;width:180px;height:180px;flex-shrink:0;}
+    #trend-pie-canvas{width:180px!important;height:180px!important;}
+    .trend-pie-legend{display:flex;flex-direction:column;gap:7px;flex:1;min-width:160px;}
+    .trend-pie-item{display:flex;align-items:center;gap:8px;font-size:.78rem;cursor:default;}
+    .trend-pie-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+    .trend-pie-label{color:var(--text-primary);flex:1;}
+    .trend-pie-pct{color:var(--gold);font-weight:700;font-family:'Cormorant Garamond',serif;font-size:.95rem;}
+    /* Cards */
     .trend-cards{display:flex;flex-direction:column;gap:10px;}
     .trend-card{background:var(--navy-mid);border:1px solid var(--border);border-radius:var(--radius-md);padding:14px 16px;transition:border-color .15s;}
     .trend-card:hover{border-color:var(--border-gold);}
-    .trend-card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;}
+    .trend-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:8px;}
     .trend-area-tag{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:2px 9px;border-radius:100px;background:rgba(201,168,76,.15);color:var(--gold);border:1px solid var(--border-gold);}
-    .trend-score{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:600;color:var(--gold);line-height:1;}
-    .trend-score-bar{height:3px;background:rgba(255,255,255,.07);border-radius:99px;margin-bottom:10px;overflow:hidden;}
+    .trend-score-row{display:flex;align-items:center;gap:6px;}
+    .trend-score-bar-mini{width:60px;height:4px;background:rgba(255,255,255,.07);border-radius:99px;overflow:hidden;}
     .trend-score-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--gold-dim),var(--gold));}
-    .trend-tema{font-size:.9rem;color:var(--text-primary);font-weight:500;margin-bottom:5px;line-height:1.45;}
-    .trend-motivo{font-size:.78rem;color:var(--text-second);line-height:1.55;margin-bottom:10px;}
-    .trend-hashtags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;}
+    .trend-score-num{font-size:.78rem;color:var(--text-second);}
+    .trend-tema{font-size:.92rem;color:var(--text-primary);font-weight:600;margin-bottom:8px;line-height:1.4;}
+    /* Query tags */
+    .trend-queries-section{margin-bottom:8px;}
+    .trend-queries-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px;}
+    .trend-queries-label.rising{color:#EF9F27;}
+    .trend-queries-label.top{color:var(--text-dim);}
+    .trend-query-tags{display:flex;flex-wrap:wrap;gap:4px;}
+    .trend-query-tag{font-size:.72rem;padding:3px 9px;border-radius:100px;cursor:default;}
+    .trend-query-tag.rising{background:rgba(239,159,39,.15);color:#EF9F27;border:1px solid rgba(239,159,39,.3);}
+    .trend-query-tag.top{background:rgba(255,255,255,.05);color:var(--text-second);border:1px solid var(--border);}
+    /* Angulo */
+    .trend-motivo{font-size:.76rem;color:var(--text-second);line-height:1.55;margin:8px 0;padding:8px 10px;background:rgba(201,168,76,.05);border-left:2px solid var(--border-gold);border-radius:0 4px 4px 0;}
+    /* Hashtags */
+    .trend-hashtags{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;}
     .trend-hashtag{font-size:.7rem;color:var(--gold);background:var(--gold-pale);border:1px solid var(--gold-border);padding:2px 8px;border-radius:100px;}
-    .trend-btn-copy{font-size:.7rem;font-weight:700;letter-spacing:.04em;padding:5px 12px;border:1px solid var(--border-gold);background:transparent;color:var(--gold);border-radius:var(--radius-sm);cursor:pointer;font-family:'Lato',sans-serif;transition:background .15s;}
+    .trend-btn-copy{font-size:.7rem;font-weight:700;letter-spacing:.04em;padding:5px 12px;border:1px solid var(--border-gold);background:transparent;color:var(--gold);border-radius:var(--radius-sm);cursor:pointer;font-family:'Lato',sans-serif;transition:background .15s;margin-top:8px;}
     .trend-btn-copy:hover{background:var(--gold-pale);}
     .trend-btn-copy.copied{border-color:#6ED5B5;color:#6ED5B5;background:rgba(15,110,86,.15);}
-    .trend-termo{font-size:.75rem;color:var(--text-dim);margin-bottom:6px;font-style:normal;}
-    .trend-termo em{color:var(--text-second);font-style:italic;}
     .trend-empty{font-size:.85rem;color:var(--text-dim);text-align:center;padding:2rem;font-style:italic;}
     .trend-loading{display:flex;align-items:center;justify-content:center;gap:10px;padding:3rem;color:var(--text-dim);font-size:.85rem;}
     .trend-spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,.1);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;}
@@ -470,6 +490,12 @@
     </div>
     <div class="trend-header-bar" id="trend-meta">
       <span>🔄 Buscando dados mais recentes...</span>
+    </div>
+    <div class="trend-pie-wrap" id="trend-pie-wrap" style="display:none">
+      <div class="trend-pie-canvas-wrap">
+        <canvas id="trend-pie-canvas"></canvas>
+      </div>
+      <div class="trend-pie-legend" id="trend-pie-legend"></div>
     </div>
     <div id="trend-container">
       <div class="trend-loading"><div class="trend-spinner"></div> Carregando temas em alta...</div>
@@ -1381,7 +1407,9 @@ function renderInsights() {
    Fase 2: trocar TREND_URL por endpoint Supabase
 ═══════════════════════════════════════════════ */
 const TREND_URL = 'https://raw.githubusercontent.com/mBaldez/baldezlabs-previdenciario/main/dados/temas_em_alta.json';
-const AREA_LABELS_FULL = {SM:'Salário Maternidade',BPC:'BPC/LOAS',AR:'Aposen. Rural',AE:'Aposen. Especial',AA:'Auxílio Acidente',PM:'Pensão por Morte'};
+const AREA_LABELS_FULL = {SM:'Salário Maternidade',BPC:'BPC/LOAS',AR:'Aposen. Rural',AE:'Aposen. Especial',AA:'Auxílio Acidente',PM:'Pensão por Morte',AI:'Aposen. Invalidez',AX:'Auxílio Acidente'};
+const PIE_COLORS = ['#C9A84C','#7BB8F5','#6ED5B5','#F0B860','#B8AAFF','#F5A0A0','#7DE8D8'];
+var trendPieChart = null;
 
 async function loadTendencias() {
   try {
@@ -1396,13 +1424,16 @@ async function loadTendencias() {
 }
 
 function renderTendencias(data) {
-  const meta = document.getElementById('trend-meta');
+  const meta      = document.getElementById('trend-meta');
   const container = document.getElementById('trend-container');
+  const pieWrap   = document.getElementById('trend-pie-wrap');
+
   if (!data) {
     meta.innerHTML = '<span style="color:#EF9F27">⚠ Não foi possível carregar. Verifique a conexão ou o repositório.</span>';
     container.innerHTML = '<div class="trend-empty">Dados não disponíveis no momento.</div>';
     return;
   }
+
   var periodo = data.periodo === 'ultimo_mes' ? 'último mês' : (data.periodo || 'último mês');
   meta.innerHTML =
     '<span>📅 Atualizado em: <span class="trend-update-date">' + (data.gerado_em||'—') + '</span> · 🔍 Google Trends Brasil · ' + periodo + '</span>' +
@@ -1410,51 +1441,15 @@ function renderTendencias(data) {
 
   const temas = data.temas_em_alta || [];
   if (!temas.length) {
-    container.innerHTML = '<div class="trend-empty">Nenhum tema registrado ainda. Execute o workflow para gerar os dados.</div>';
+    container.innerHTML = '<div class="trend-empty">Nenhum tema registrado ainda. Execute o script local para gerar os dados.</div>';
     return;
   }
 
-  container.innerHTML = '<div class="trend-cards">' + temas.map(function(t) {
-    const areaLabel  = AREA_LABELS_FULL[t.area] || t.area;
-    const interesse  = t.interesse_google != null ? t.interesse_google : Math.round((t.score_estimado || 0) * 10);
-    const barPct     = Math.min(100, interesse).toFixed(0);
-    const hashtags   = (t.hashtags_relacionadas || []);
-    const hashStr    = hashtags.join(' ').replace(/"/g,'&quot;');
-    const termoLabel = t.termo_pesquisado ? '<div class="trend-termo">🔍 Busca: <em>"' + t.termo_pesquisado + '"</em></div>' : '';
-    const angulo     = t.angulo_conteudo || t.motivo || '';
-    return '<div class="trend-card">' +
-      '<div class="trend-card-top">' +
-        '<span class="trend-area-tag">' + areaLabel + '</span>' +
-        '<span class="trend-score">' + interesse + '<small style="font-size:.9rem;opacity:.6">/100</small></span>' +
-      '</div>' +
-      '<div class="trend-score-bar"><div class="trend-score-fill" style="width:' + barPct + '%"></div></div>' +
-      '<div class="trend-tema">' + t.tema + '</div>' +
-      termoLabel +
-      (angulo ? '<div class="trend-motivo"><strong style="font-size:.7rem;color:var(--gold);text-transform:uppercase;letter-spacing:.05em">Ângulo de conteúdo</strong><br>' + angulo + '</div>' : '') +
-      '<div class="trend-hashtags">' + hashtags.map(function(h){return '<span class="trend-hashtag">'+h+'</span>';}).join('') + '</div>' +
-      '<button class="trend-btn-copy" data-hash="' + hashStr + '">📋 Copiar hashtags</button>' +
-    '</div>';
-  }).join('') + '</div>';
-
-  container.querySelectorAll('.trend-btn-copy').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      navigator.clipboard.writeText(this.dataset.hash).then(function() {
-        btn.textContent = '✅ Copiado!';
-        btn.classList.add('copied');
-        setTimeout(function(){ btn.textContent = '📋 Copiar hashtags'; btn.classList.remove('copied'); }, 2000);
-      });
-    });
-  });
-}
-
-renderCalendar();
-buildCatFilters('todos');
-renderThemes('todos', 'todos');
-renderRoteiros();
-renderImpulsionar('SM');
-renderInsights();
-loadTendencias();
-</script>
-</body>
-</html>
-                                                                                                                                                                                                                                                                                                                                                                                                    
+  // ── Pie chart ──────────────────────────────
+  pieWrap.style.display = 'flex';
+  const total = temas.reduce(function(s,t){ return s + (t.interesse_google||0); }, 0) || 1;
+  const pieLegend = document.getElementById('trend-pie-legend');
+  pieLegend.innerHTML = temas.map(function(t,i){
+    const pct = Math.round((t.interesse_google||0) / total * 100);
+    return '<div class="trend-pie-item">' +
+      '<div class="trend-pie-dot" style="background:' + PIE_COLORS[i % PIE_COLOR
