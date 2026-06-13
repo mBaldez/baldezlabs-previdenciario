@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  base: '/linha-do-tempo-perfeita/',
+  base: '/baldezlabs-previdenciario/ldt/',
   test: {
     environment: 'jsdom',
     setupFiles: ['./tests/setup.js'],
