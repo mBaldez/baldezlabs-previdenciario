@@ -1,74 +1,30 @@
 {
   "gerado_em": "2026-06-13",
-  "fonte": "apify_instagram_scraper",
+  "fonte": "google_trends_brasil",
+  "periodo": "ultimo_mes",
   "proxima_atualizacao": "automatica_via_github_actions",
-  "score_corte": 8.6,
-  "posts_analisados_total": 200,
-  "posts_classificados": 9,
+  "score_corte": 6.0,
   "temas_em_alta": [
     {
       "tema": "BPC / LOAS",
       "area": "BPC",
-      "score_estimado": 6.4,
-      "motivo": "6 posts · mediana 521 likes · 1 perfis abordaram",
-      "hashtags_relacionadas": [
-        "#inss",
-        "#direitoprevidenciário",
-        "#bpcloas",
-        "#loas",
-        "#autismo"
-      ]
+      "termo_pesquisado": "BPC autismo",
+      "interesse_google": 85,
+      "score_estimado": 8.5,
+      "angulo_conteudo": "Muitas famílias não sabem que têm direito — explique os critérios de forma simples",
+      "hashtags_relacionadas": ["#bpc", "#autismo", "#tea", "#loas", "#direitoprevidenciario"]
     },
     {
       "tema": "Aposentadoria Rural",
       "area": "AR",
-      "score_estimado": 5.9,
-      "motivo": "1 posts · mediana 59596 likes · 1 perfis abordaram",
-      "hashtags_relacionadas": [
-        "#agricultor",
-        "#aposentadoriarural",
-        "#inss",
-        "#direitoprevidenciário"
-      ]
+      "termo_pesquisado": "aposentadoria rural documentos",
+      "interesse_google": 78,
+      "score_estimado": 7.8,
+      "angulo_conteudo": "Documentação é a maior dificuldade — roteiros de 'o que preciso juntar' têm alto alcance",
+      "hashtags_relacionadas": ["#aposentadoriarural", "#seguidorespecial", "#trabalhadorarural", "#inss"]
     },
     {
-      "tema": "Aposentadoria Especial",
-      "area": "AE",
-      "score_estimado": 5.9,
-      "motivo": "1 posts · mediana 1230 likes · 1 perfis abordaram",
-      "hashtags_relacionadas": [
-        "#aposentadoriaespecial",
-        "#adi6309",
-        "#stf",
-        "#direitoprevidenciário",
-        "#inss"
-      ]
-    },
-    {
-      "tema": "Auxílio Acidente",
-      "area": "AA",
-      "score_estimado": 3.0,
-      "motivo": "1 posts · mediana 41 likes · 1 perfis abordaram",
-      "hashtags_relacionadas": [
-        "#auxilioacidente",
-        "#inss",
-        "#direitoprevidenciario",
-        "#acidentedetrabalho",
-        "#aposentadoria"
-      ]
-    }
-  ],
-  "temas_emergentes": [
-    "#aposentadoria",
-    "#advogada",
-    "#direitos",
-    "#advocaciaprevidenciaria",
-    "#direitoprevidenciario",
-    "#justiça",
-    "#notícias",
-    "#advogadaprevidenciarista",
-    "#fabioturazza",
-    "#pericia",
-    "#direitoprevidenciário"
-  ]
-}
+      "tema": "Salário Maternidade",
+      "area": "SM",
+      "termo_pesquisado": "salário maternidade MEI",
+ 
