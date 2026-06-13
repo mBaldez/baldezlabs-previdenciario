@@ -25,3 +25,7 @@ npm-debug.log
 # Dados sensíveis
 dados/metricas_raw.json
 dados/access_token.txt
+
+# Credenciais locais — nunca enviar ao GitHub
+scripts/secrets.env
+scripts/rodar_analise_local.bat

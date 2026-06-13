@@ -1,10 +1,11 @@
 name: Análise Semanal de Mercado
 
+# Workflow mantido para referência futura (Fase 2 — Meta Graph API)
+# A análise atualmente roda localmente via scripts/rodar_analise_local.bat
+# e o resultado é enviado manualmente ao GitHub todo domingo.
+
 on:
-  schedule:
-    # Todo domingo às 08:00 (horário de Brasília = 11:00 UTC)
-    - cron: '0 11 * * 0'
-  workflow_dispatch:
+  workflow_dispatch:  # Apenas manual — sem cron ativo por enquanto
 
 permissions:
   contents: write
@@ -13,34 +14,8 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
-  analisar:
+  placeholder:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout do repositório
-        uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Configurar Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: Instalar dependências
-        run: pip install instaloader
-
-      - name: Executar análise de mercado
-        env:
-          CONCORRENTES_LIST: ${{ secrets.CONCORRENTES_LIST }}
-          IG_USER: ${{ secrets.IG_USER }}
-          IG_PASS: ${{ secrets.IG_PASS }}
-        run: python scripts/analise_concorrencia.py
-
-      - name: Commit e push dos resultados
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Actions"
-          git add dados/temas_em_alta.json
-          git diff --staged --quiet || git commit -m "🤖 Atualiza temas em alta — $(date +'%Y-%m-%d')"
-          git push
+      - name: Info
+        run: echo "Análise rodando localmente. Ver scripts/rodar_analise_local.bat"
