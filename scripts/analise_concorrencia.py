@@ -32,7 +32,7 @@ CATEGORIAS_HASHTAGS = {
 
 SCORE_CORTE = 8.6
 
-APIFY_ACTOR = "apify/instagram-profile-scraper"
+APIFY_ACTOR = "apify~instagram-profile-scraper"
 APIFY_RUN_URL = f"https://api.apify.com/v2/acts/{APIFY_ACTOR}/run-sync-get-dataset-items"
 
 
