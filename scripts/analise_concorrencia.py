@@ -94,14 +94,22 @@ def classificar_tema(hashtags: list) -> str:
 
 
 def calcular_score(likes_total, posts, frequencia, num_perfis) -> float:
+    """
+    Score 0–10 calibrado para contas de nicho (benchmark: 150 likes médios).
+    Parâmetros:
+      likes_score  (40%): engajamento médio — benchmark 150 likes = score máx
+      freq_score   (35%): quantos perfis diferentes abordaram o tema
+      sat_bonus    (15%): bônus para temas pouco explorados (<50% dos perfis)
+      volume_score (10%): volume de posts sobre o tema
+    """
     if posts == 0:
         return 0.0
     media_likes    = likes_total / posts
-    likes_score    = min(media_likes / 500, 1.0) * 4.0
-    freq_score     = (frequencia / num_perfis) * 3.0
+    likes_score    = min(media_likes / 150, 1.0) * 4.0   # benchmark 150 likes
+    freq_score     = (frequencia / num_perfis) * 3.5
     saturacao      = frequencia / num_perfis
-    sat_bonus      = (1 - saturacao) * 2.0 if saturacao > 0.7 else 2.0
-    volume_score   = min(posts / 20, 1.0) * 1.0
+    sat_bonus      = (1 - saturacao) * 1.5 if saturacao > 0.5 else 1.5
+    volume_score   = min(posts / 10, 1.0) * 1.0
     return round(min(likes_score + freq_score + sat_bonus + volume_score, 10.0), 1)
 
 
@@ -142,17 +150,26 @@ def processar_posts(items: list, num_perfis: int) -> list:
         score = calcular_score(d["likes"], d["posts"], freq, num_perfis)
         top_tags = [f"#{t}" for t, _ in Counter(d["hashtags"]).most_common(5)]
 
-        if score >= SCORE_CORTE:
-            media_l = round(d["likes"] / max(d["posts"], 1))
-            temas.append({
-                "tema": NOMES_AREAS.get(area, area),
-                "area": area,
-                "score_estimado": score,
-                "motivo": f"{d['posts']} posts · média {media_l} likes · {freq} perfis abordaram",
-                "hashtags_relacionadas": top_tags,
-            })
+        media_l = round(d["likes"] / max(d["posts"], 1))
+        temas.append({
+            "tema": NOMES_AREAS.get(area, area),
+            "area": area,
+            "score_estimado": score,
+            "motivo": f"{d['posts']} posts analisados · média {media_l} likes · {freq} perfis abordaram o tema",
+            "hashtags_relacionadas": top_tags,
+        })
 
-    return sorted(temas, key=lambda x: x["score_estimado"], reverse=True)
+    temas_ordenados = sorted(temas, key=lambda x: x["score_estimado"], reverse=True)
+
+    # Diagnóstico
+    print("\n📊 Scores detectados:")
+    for t in temas_ordenados:
+        flag = "✅" if t["score_estimado"] >= SCORE_CORTE else "  "
+        print(f"   {flag} {t['area']}: {t['score_estimado']} — {t['motivo']}")
+
+    # Sempre retorna top 6 (nunca vazio); aplica corte só se houver temas acima dele
+    acima_corte = [t for t in temas_ordenados if t["score_estimado"] >= SCORE_CORTE]
+    return acima_corte if acima_corte else temas_ordenados[:6]
 
 
 def main():
@@ -182,7 +199,7 @@ def main():
     with open(OUTPUT_JSON, "w", encoding="utf-8") as f:
         json.dump(output, f, ensure_ascii=False, indent=2)
 
-    print(f"\n✅ {len(temas)} temas acima do corte {SCORE_CORTE} salvos")
+    print(f"\n✅ {len(temas)} temas salvos (corte {SCORE_CORTE})")
 
 
 if __name__ == "__main__":
