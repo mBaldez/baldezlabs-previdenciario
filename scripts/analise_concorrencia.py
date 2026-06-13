@@ -57,7 +57,6 @@ SCORE_CORTE = 6.0
 
 
 def buscar_um_termo(pytrends, termo):
-    """Tenta buscar um unico termo, com retry em caso de 429."""
     for tentativa in range(3):
         try:
             pytrends.build_payload([termo], timeframe="today 1-m", geo="BR")
@@ -83,7 +82,7 @@ def buscar_tendencias():
     total = len(TERMOS_PRINCIPAIS)
 
     for i, (area, termo) in enumerate(TERMOS_PRINCIPAIS.items(), 1):
-        print(f"  [{i}/{total}] '{termo}'...", end=" ", flush=True)
+        print(f"  [{i}/{total}] \'{termo}\'...", end=" ", flush=True)
         interesse = buscar_um_termo(pytrends, termo)
         if interesse is not None:
             resultados[area] = {"termo": termo, "interesse": interesse}
@@ -103,7 +102,7 @@ def gerar_temas(resultados):
         interesse = dado["interesse"]
         score = round(min(interesse / 10, 10.0), 1)
         flag = "OK" if score >= SCORE_CORTE else "  "
-        print(f"   {flag} {area}: {interesse}/100 (score {score}) - '{dado['termo']}'")
+        print(f"   {flag} {area}: {interesse}/100 (score {score}) - \'{dado[\'termo\']}\'")
         temas.append({
             "tema":                  NOMES.get(area, area),
             "area":                  area,
@@ -140,9 +139,8 @@ def main():
         "temas_em_alta":       temas,
     }
 
-    # Validar JSON antes de salvar
     content = json.dumps(output, ensure_ascii=False, indent=2)
-    json.loads(content)  # lanca excecao se invalido
+    json.loads(content)  # valida antes de salvar
 
     with open(OUTPUT_JSON, "w", encoding="utf-8") as f:
         f.write(content)
