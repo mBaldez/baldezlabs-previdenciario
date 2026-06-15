@@ -47,9 +47,10 @@ describe('Aposentadoria Rural', () => {
     expect(r.total).toBe(0)
   })
 
-  test('com 1 IR, sem vinculos: rural = duracao(inicio, der)', () => {
+  test('com 1 IR: rural = intersecao entre periodo declarado e janela de 90 meses do IR', () => {
     const r = calcularCarencia({ ...base, instrumentosRatificadores: [MY(1, 2013)] })
-    expect(r.rural).toBe(duracaoMeses(MY(1, 2011), MY(6, 2026)))
+    // Janela do IR (Jan/2013) = [Jul/2005, Jan/2013). Intersecao com [Jan/2011, Jun/2026) = [Jan/2011, Jan/2013).
+    expect(r.rural).toBe(duracaoMeses(MY(1, 2011), MY(1, 2013)))
     expect(r.total).toBe(r.rural)
   })
 
@@ -160,5 +161,50 @@ describe('Beneficio por Incapacidade', () => {
     })
     expect(com.total).toBe(sem.total)
     expect(com.rural).toBe(sem.rural)
+  })
+})
+
+// --- Janela de 90 meses do instrumento ratificador (Oficio-Circular 46/DIRBEN/INSS) ---
+describe('Janela de 90 meses do instrumento ratificador (oficio 46)', () => {
+  test('IR muito recente, periodo declarado muito antigo: janela nao alcanca -> rural=0', () => {
+    const r = calcularCarencia({
+      tipoBeneficio: 'aposentadoria_rural',
+      inicioAtividade: MY(1, 2000),
+      der: MY(12, 2001),
+      vinculosUrbanos: [],
+      provasRetorno: [],
+      instrumentosRatificadores: [MY(1, 2020)],
+      beneficiosIncapacidade: [],
+    })
+    expect(r.rural).toBe(0)
+  })
+
+  test('periodo declarado > 90 meses: janela do IR limita reconhecimento a 90 meses', () => {
+    const r = calcularCarencia({
+      tipoBeneficio: 'aposentadoria_rural',
+      inicioAtividade: MY(1, 2000),
+      der: MY(12, 2020),
+      vinculosUrbanos: [],
+      provasRetorno: [],
+      instrumentosRatificadores: [MY(12, 2020)],
+      beneficiosIncapacidade: [],
+    })
+    expect(r.rural).toBe(90)
+  })
+
+  test('multiplos IRs com janelas sobrepostas: uniao sem duplicar overlap', () => {
+    const r = calcularCarencia({
+      tipoBeneficio: 'aposentadoria_rural',
+      inicioAtividade: MY(1, 2010),
+      der: MY(6, 2026),
+      vinculosUrbanos: [],
+      provasRetorno: [],
+      instrumentosRatificadores: [MY(1, 2013), MY(1, 2014)],
+      beneficiosIncapacidade: [],
+    })
+    // Janela IR1 (Jan/2013) = [Jul/2005, Jan/2013) -> intersecao = [Jan/2010, Jan/2013) = 36 meses
+    // Janela IR2 (Jan/2014) = [Jul/2006, Jan/2014) -> intersecao = [Jan/2010, Jan/2014) = 48 meses
+    // Uniao dos dois (o 2o contem o 1o) = 48, NAO 36+48=84
+    expect(r.rural).toBe(48)
   })
 })

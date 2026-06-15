@@ -1,10 +1,13 @@
 /**
  * Motor de calculo de carencia previdenciaria rural.
  *
- * Logica confirmada: regras 1-7 do mapeamento do concorrente SLT.
- * ESTIMADO: formula exata de expansao do Tempo Rural via IR
- * nao foi derivada com certeza — ver comentario na funcao calcularCarencia.
+ * Logica baseada no Oficio-Circular 46/DIRBEN/INSS (13/09/2019): cada instrumento
+ * ratificador (IR) abre uma janela de 90 meses retroativos a partir da sua data;
+ * o periodo rural reconhecido e a uniao das intersecoes entre essas janelas e os
+ * periodos rurais autodeclarados. Ver carencia_rural_90_meses_oficio46.md na raiz do repo.
  */
+
+const JANELA_INSTRUMENTO_MESES = 90
 
 /** Converte {mes, ano} para numero absoluto de meses */
 export function mesParaAbsoluto({ mes, ano }) {
@@ -14,6 +17,89 @@ export function mesParaAbsoluto({ mes, ano }) {
 /** Duracao em meses entre dois {mes, ano} (exclusivo no fim) */
 export function duracaoMeses(inicio, fim) {
   return (fim.ano - inicio.ano) * 12 + (fim.mes - inicio.mes)
+}
+
+/** Janela de retroatividade de um IR: 90 meses antes da sua data, ate a sua data */
+function janelaInstrumento(dataIR) {
+  const fim = mesParaAbsoluto(dataIR)
+  return { inicio: fim - JANELA_INSTRUMENTO_MESES, fim }
+}
+
+/** Intersecao entre dois intervalos [inicio, fim) em meses absolutos. Retorna null se vazia. */
+function intersecao(a, b) {
+  const inicio = Math.max(a.inicio, b.inicio)
+  const fim = Math.min(a.fim, b.fim)
+  return inicio < fim ? { inicio, fim } : null
+}
+
+/** Soma a duracao da uniao de intervalos, sem contar overlap duas vezes */
+function totalUniao(intervalos) {
+  const validos = intervalos.filter(Boolean).sort((a, b) => a.inicio - b.inicio)
+  if (validos.length === 0) return 0
+
+  let total = 0
+  let atual = { ...validos[0] }
+
+  for (let i = 1; i < validos.length; i++) {
+    const seg = validos[i]
+    if (seg.inicio <= atual.fim) {
+      atual.fim = Math.max(atual.fim, seg.fim)
+    } else {
+      total += atual.fim - atual.inicio
+      atual = { ...seg }
+    }
+  }
+  total += atual.fim - atual.inicio
+  return total
+}
+
+/**
+ * Segmentos do periodo rural autodeclarado (em meses absolutos, [inicio, fim)).
+ * Cada vinculo urbano interrompe o periodo rural; uma Prova de Retorno (PR)
+ * posterior ao fim do vinculo reabre o reconhecimento a partir da data da PR
+ * (regra: PR nao retroage).
+ */
+function segmentosRuraisDeclarados(inicioAtividade, der, vinculosUrbanos, provasRetorno) {
+  const inicioAbs = mesParaAbsoluto(inicioAtividade)
+  const derAbs = mesParaAbsoluto(der)
+
+  if (vinculosUrbanos.length === 0) {
+    return [{ inicio: inicioAbs, fim: derAbs }]
+  }
+
+  const vinculos = [...vinculosUrbanos].sort(
+    (a, b) => mesParaAbsoluto(a.inicio) - mesParaAbsoluto(b.inicio)
+  )
+  const provas = [...provasRetorno].sort(
+    (a, b) => mesParaAbsoluto(a) - mesParaAbsoluto(b)
+  )
+
+  const segmentos = []
+  let cursor = inicioAbs
+
+  for (let i = 0; i < vinculos.length; i++) {
+    const vInicio = mesParaAbsoluto(vinculos[i].inicio)
+    const vFim = mesParaAbsoluto(vinculos[i].fim)
+    const proximoInicio = i + 1 < vinculos.length
+      ? mesParaAbsoluto(vinculos[i + 1].inicio)
+      : derAbs
+
+    if (vInicio > cursor) {
+      segmentos.push({ inicio: cursor, fim: vInicio })
+    }
+
+    // PR nao retroage: vale a primeira PR a partir do fim do vinculo
+    const pr = provas.find(
+      (p) => mesParaAbsoluto(p) >= vFim && mesParaAbsoluto(p) < proximoInicio
+    )
+    cursor = pr ? mesParaAbsoluto(pr) : proximoInicio
+  }
+
+  if (cursor < derAbs) {
+    segmentos.push({ inicio: cursor, fim: derAbs })
+  }
+
+  return segmentos
 }
 
 /**
@@ -40,82 +126,22 @@ export function calcularCarencia({
   instrumentosRatificadores,
   // beneficiosIncapacidade — recebido mas nao usado no calculo (marcador visual apenas)
 }) {
-  // Regra 1: Sem IR => tempo rural = 0 (confirmado)
-  if (instrumentosRatificadores.length === 0) {
-    if (tipoBeneficio === 'hibrida') {
-      const urbano = _calcularMesesUrbanos(vinculosUrbanos)
-      return { rural: 0, urbano, total: urbano }
-    }
-    return { rural: 0, total: 0 }
+  let mesesRural = 0
+
+  if (instrumentosRatificadores.length > 0) {
+    const segmentos = segmentosRuraisDeclarados(inicioAtividade, der, vinculosUrbanos, provasRetorno)
+    const janelas = instrumentosRatificadores.map(janelaInstrumento)
+    const intersecoes = segmentos.flatMap((seg) => janelas.map((j) => intersecao(seg, j)))
+    mesesRural = totalUniao(intersecoes)
   }
 
-  // Calcular meses rurais
-  // ⚠️ ESTIMADO: logica baseada em observacoes do SLT, nao derivada formalmente.
-  // Hipotese: rural = periodo antes do primeiro vinculo + periodo pos-PR apos ultimo vinculo.
-  // Se nao ha vinculos urbanos, rural = todo o periodo de inicioAtividade ate DER.
-  const mesesRural = _calcularMesesRural(inicioAtividade, der, vinculosUrbanos, provasRetorno)
-
-  // Vinculos urbanos
   const mesesUrbanos = _calcularMesesUrbanos(vinculosUrbanos)
 
-  // Regra 6: Hibrida => total = rural + urbano
   if (tipoBeneficio === 'hibrida') {
-    return {
-      rural: mesesRural,
-      urbano: mesesUrbanos,
-      total: mesesRural + mesesUrbanos,
-    }
+    return { rural: mesesRural, urbano: mesesUrbanos, total: mesesRural + mesesUrbanos }
   }
 
-  // Regra 5: Aposentadoria Rural e Demais Rurais => total = rural (urbano nao conta)
   return { rural: mesesRural, total: mesesRural }
-}
-
-/**
- * Calcula meses rurais efetivos.
- *
- * ⚠️ ESTIMADO: a formula exata de como o IR expande o "Tempo Rural Efetivamente
- * Reconhecido" nao foi derivada com certeza. Usando logica observada:
- * - Sem vinculos urbanos: rural = duracao(inicioAtividade, der)
- * - Com vinculos: rural = periodo antes do primeiro vinculo
- *   + periodo apos ultima Prova de Retorno (se houver PR apos ultimo vinculo)
- */
-function _calcularMesesRural(inicioAtividade, der, vinculosUrbanos, provasRetorno) {
-  if (vinculosUrbanos.length === 0) {
-    // Sem vinculos: todo periodo de inicioAtividade ate DER
-    return duracaoMeses(inicioAtividade, der)
-  }
-
-  // Ordenar vinculos por data de inicio
-  const vincOrdenados = [...vinculosUrbanos].sort(
-    (a, b) => mesParaAbsoluto(a.inicio) - mesParaAbsoluto(b.inicio)
-  )
-  // Ordenar provas de retorno por data
-  const provasOrdenadas = [...provasRetorno].sort(
-    (a, b) => mesParaAbsoluto(a) - mesParaAbsoluto(b)
-  )
-
-  // Regra 2: Vinculo Urbano interrompe carencia rural
-  // Periodo antes do primeiro vinculo
-  const primeiroVinculo = vincOrdenados[0]
-  let rural = duracaoMeses(inicioAtividade, primeiroVinculo.inicio)
-  if (rural < 0) rural = 0
-
-  // Regra 3: Prova de Retorno nao retroage — tempo rural valido so A PARTIR da data da PR
-  const ultimoVinculo = vincOrdenados[vincOrdenados.length - 1]
-  const provasAposUltimoVinculo = provasOrdenadas.filter(
-    (pr) => mesParaAbsoluto(pr) > mesParaAbsoluto(ultimoVinculo.fim)
-  )
-
-  if (provasAposUltimoVinculo.length > 0) {
-    const primeiraPRValida = provasAposUltimoVinculo[0]
-    const periodoPosPR = duracaoMeses(primeiraPRValida, der)
-    if (periodoPosPR > 0) {
-      rural += periodoPosPR
-    }
-  }
-
-  return rural < 0 ? 0 : rural
 }
 
 /** Soma duracao de todos os vinculos urbanos */
