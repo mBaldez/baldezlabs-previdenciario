@@ -95,9 +95,12 @@ absolutos (`anoInicio*12 .. (anoFim*12 + 11)`). A barra colorida (mes a
 mes) e os marcadores IR/PR/DER/Inicio de cada fileira sao determinados
 exclusivamente por esse intervalo — sem tratamento especial de borda (um
 segmento de carencia/vinculo que atravessa duas fileiras simplesmente
-aparece "cortado" em cada uma, o que e o comportamento correto). Setas
-curvas conectam apenas fileiras consecutivas (N fileiras -> N-1 setas);
-a ultima fileira nao tem seta de saida.
+aparece "cortado" em cada uma, o que e o comportamento correto). Como os
+intervalos nao se sobrepoem, um marcador pontual (IR/PR/DER/Inicio) cujo
+mes absoluto cai exatamente na fronteira pertence a exatamente uma
+fileira — a que contem aquele mes — e nunca aparece duplicado nem fica
+de fora. Setas curvas conectam apenas fileiras consecutivas (N fileiras
+-> N-1 setas); a ultima fileira nao tem seta de saida.
 
 ### Contrato de dados (DB -> `calculo.js` -> `lib/eixo.js` -> eixo)
 
@@ -150,9 +153,10 @@ export function segmentosCarencia({ inicioAtividade, der, vinculosUrbanos, prova
 }
 ```
 
-Sera coberta por testes (TDD), espelhando os 4 cenarios do Oficio 46 ja
-testados em `calcularCarencia` (1 IR, janela limitando a 90 meses, uniao
-de janelas sobrepostas, IR que nao alcanca o periodo declarado).
+Sera coberta por testes (TDD): 3 cenarios que ja existem para
+`calcularCarencia` (1 IR cobre tudo, janela limitando a 90 meses, uniao
+de janelas sobrepostas) + 1 cenario novo (buraco entre janelas de IRs
+nao sobrepostas) — ver secao "Testes" abaixo para o detalhamento.
 
 **Limitacao herdada da Fase 1** (ja documentada na Nota de Escopo): B41
 (2 blocos de 90 meses), regra "periodo mais antigo" da hibrida e
