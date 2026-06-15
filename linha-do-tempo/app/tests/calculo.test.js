@@ -1,4 +1,4 @@
-import { calcularCarencia, duracaoMeses, mesParaAbsoluto } from '../src/lib/calculo'
+import { calcularCarencia, duracaoMeses, mesParaAbsoluto, segmentosCarencia } from '../src/lib/calculo'
 
 // Helper
 const MY = (mes, ano) => ({ mes, ano })
@@ -206,5 +206,61 @@ describe('Janela de 90 meses do instrumento ratificador (oficio 46)', () => {
     // Janela IR2 (Jan/2014) = [Jul/2006, Jan/2014) -> intersecao = [Jan/2010, Jan/2014) = 48 meses
     // Uniao dos dois (o 2o contem o 1o) = 48, NAO 36+48=84
     expect(r.rural).toBe(48)
+  })
+})
+
+// --- segmentosCarencia (Fase 3 — segmentos para a visualizacao) ---
+describe('segmentosCarencia', () => {
+  test('IR cobre todo o periodo declarado -> 1 segmento igual ao periodo declarado', () => {
+    const segs = segmentosCarencia({
+      inicioAtividade: MY(1, 2018),
+      der: MY(12, 2020),
+      vinculosUrbanos: [],
+      provasRetorno: [],
+      instrumentosRatificadores: [MY(12, 2020)],
+    })
+    expect(segs).toEqual([
+      { inicio: mesParaAbsoluto(MY(1, 2018)), fim: mesParaAbsoluto(MY(12, 2020)) },
+    ])
+  })
+
+  test('periodo declarado > 90 meses: segmento fica limitado a janela do IR', () => {
+    const segs = segmentosCarencia({
+      inicioAtividade: MY(1, 2000),
+      der: MY(12, 2020),
+      vinculosUrbanos: [],
+      provasRetorno: [],
+      instrumentosRatificadores: [MY(12, 2020)],
+    })
+    expect(segs).toEqual([
+      { inicio: mesParaAbsoluto(MY(6, 2013)), fim: mesParaAbsoluto(MY(12, 2020)) },
+    ])
+  })
+
+  test('2 IRs com janelas sobrepostas -> 1 segmento (uniao, sem duplicar)', () => {
+    const segs = segmentosCarencia({
+      inicioAtividade: MY(1, 2010),
+      der: MY(6, 2026),
+      vinculosUrbanos: [],
+      provasRetorno: [],
+      instrumentosRatificadores: [MY(1, 2013), MY(1, 2014)],
+    })
+    expect(segs).toEqual([
+      { inicio: mesParaAbsoluto(MY(1, 2010)), fim: mesParaAbsoluto(MY(1, 2014)) },
+    ])
+  })
+
+  test('2 IRs com janelas NAO sobrepostas: 2 segmentos com buraco entre eles', () => {
+    const segs = segmentosCarencia({
+      inicioAtividade: MY(1, 2000),
+      der: MY(12, 2025),
+      vinculosUrbanos: [],
+      provasRetorno: [],
+      instrumentosRatificadores: [MY(12, 2007), MY(12, 2020)],
+    })
+    expect(segs).toEqual([
+      { inicio: mesParaAbsoluto(MY(6, 2000)), fim: mesParaAbsoluto(MY(12, 2007)) },
+      { inicio: mesParaAbsoluto(MY(6, 2013)), fim: mesParaAbsoluto(MY(12, 2020)) },
+    ])
   })
 })

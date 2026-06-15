@@ -32,12 +32,12 @@ function intersecao(a, b) {
   return inicio < fim ? { inicio, fim } : null
 }
 
-/** Soma a duracao da uniao de intervalos, sem contar overlap duas vezes */
-function totalUniao(intervalos) {
+/** Uniao de intervalos [inicio, fim), mesclando sobreposicoes. Ordenada por inicio. */
+function uniaoIntervalos(intervalos) {
   const validos = intervalos.filter(Boolean).sort((a, b) => a.inicio - b.inicio)
-  if (validos.length === 0) return 0
+  if (validos.length === 0) return []
 
-  let total = 0
+  const uniao = []
   let atual = { ...validos[0] }
 
   for (let i = 1; i < validos.length; i++) {
@@ -45,12 +45,17 @@ function totalUniao(intervalos) {
     if (seg.inicio <= atual.fim) {
       atual.fim = Math.max(atual.fim, seg.fim)
     } else {
-      total += atual.fim - atual.inicio
+      uniao.push(atual)
       atual = { ...seg }
     }
   }
-  total += atual.fim - atual.inicio
-  return total
+  uniao.push(atual)
+  return uniao
+}
+
+/** Soma a duracao da uniao de intervalos, sem contar overlap duas vezes */
+function totalUniao(intervalos) {
+  return uniaoIntervalos(intervalos).reduce((acc, seg) => acc + (seg.fim - seg.inicio), 0)
 }
 
 /**
@@ -142,6 +147,22 @@ export function calcularCarencia({
   }
 
   return { rural: mesesRural, total: mesesRural }
+}
+
+/**
+ * Segmentos de carencia rural reconhecidos: uniao das intersecoes entre os
+ * periodos rurais autodeclarados e as janelas de 90 meses de cada instrumento
+ * ratificador. Mesma logica de calcularCarencia, mas devolve os segmentos
+ * {inicio, fim} (meses absolutos) em vez de so o total — usado pela
+ * visualizacao (Fase 3) para desenhar a faixa de carencia com "buracos".
+ */
+export function segmentosCarencia({ inicioAtividade, der, vinculosUrbanos, provasRetorno, instrumentosRatificadores }) {
+  if (instrumentosRatificadores.length === 0) return []
+
+  const segmentos = segmentosRuraisDeclarados(inicioAtividade, der, vinculosUrbanos, provasRetorno)
+  const janelas = instrumentosRatificadores.map(janelaInstrumento)
+  const intersecoes = segmentos.flatMap((seg) => janelas.map((j) => intersecao(seg, j)))
+  return uniaoIntervalos(intersecoes)
 }
 
 /** Soma duracao de todos os vinculos urbanos */
