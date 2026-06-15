@@ -65,6 +65,7 @@ export function EditorToolbar({
       <select
         value={viewAtiva}
         onChange={e => onChangeView(e.target.value)}
+        className="select-on-dark"
         style={{
           background: 'rgba(255,255,255,0.1)', color: 'white',
           border: '1px solid rgba(255,255,255,0.2)', borderRadius: '4px',
@@ -78,6 +79,7 @@ export function EditorToolbar({
       <select
         value={modeloVisual}
         onChange={e => onChangeModelo(e.target.value)}
+        className="select-on-dark"
         style={{
           background: 'rgba(255,255,255,0.1)', color: 'white',
           border: '1px solid rgba(255,255,255,0.2)', borderRadius: '4px',
