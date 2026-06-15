@@ -140,7 +140,11 @@ export function EditorPage() {
   const secoes = [
     {
       titulo: 'Exercício da Atividade Rural',
-      conteudo: <SecaoAtividadeRural timeline={timeline} onAtualizar={async (campos) => { setSalvando(true); await atualizar(campos); setSalvando(false) }} />
+      conteudo: <SecaoAtividadeRural
+        timeline={timeline}
+        onAtualizar={async (campos) => { setSalvando(true); await atualizar(campos); setSalvando(false) }}
+        onGerar={() => setViewAtiva('timeline')}
+      />
     },
     {
       titulo: 'Vínculos Urbanos',
