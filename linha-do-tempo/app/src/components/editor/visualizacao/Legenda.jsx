@@ -1,9 +1,10 @@
 const ITENS = [
-  { cor: '#e67e22', label: 'Carência (janelas de 90 meses)' },
+  { cor: '#e67e22', label: 'Carência reconhecida' },
   { cor: '#27ae60', label: 'Instrumentos Ratificadores (IR)' },
   { cor: '#3498db', label: 'Vínculo Urbano' },
   { cor: '#e74c3c', label: 'Prova de Retorno' },
   { cor: '#f1c40f', label: 'Gozo de Benefício por Incapacidade' },
+  { cor: '#BDC3C7', label: 'Sem cobertura' },
 ]
 
 export function Legenda() {
