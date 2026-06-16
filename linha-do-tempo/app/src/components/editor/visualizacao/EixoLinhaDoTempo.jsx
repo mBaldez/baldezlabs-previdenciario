@@ -40,7 +40,7 @@ export function EixoLinhaDoTempo({ anoInicio, anoFim, categoriaPorMes, irs, prov
   const mostrarDer = derMesAbs >= mesInicial && derMesAbs <= mesFinal
   const mostrarInicio = inicioMesAbs >= mesInicial && inicioMesAbs <= mesFinal
 
-  // Fronteiras das janelas de 90 meses (linhas de bloco)
+  // Fronteiras das janelas de 90 meses
   const janelas = (der?.mes && der?.ano && inicio?.mes && inicio?.ano)
     ? janelasDerAncoradas(der, inicio)
     : []
@@ -57,22 +57,35 @@ export function EixoLinhaDoTempo({ anoInicio, anoFim, categoriaPorMes, irs, prov
       ? (anoFim - ano) * ANO_WIDTH
       : (ano - anoInicio) * ANO_WIDTH
 
+  // Agrupa meses consecutivos de mesma cor em segmentos contínuos (sem quadrados)
+  const segmentosCor = []
+  for (const m of meses) {
+    const cat = categoriaPorMes(m)
+    const ultimo = segmentosCor[segmentosCor.length - 1]
+    if (ultimo && ultimo.cat === cat) {
+      ultimo.fim = m
+    } else {
+      segmentosCor.push({ inicio: m, fim: m, cat })
+    }
+  }
+
   return (
     <svg width={totalWidth} height={SVG_HEIGHT} style={{ display: 'block' }}>
-      {/* Barra colorida por mes */}
-      {meses.map(mesAbs => {
-        const categoria = categoriaPorMes(mesAbs)
+      {/* Barra contínua por categoria (sem quadrados de meses) */}
+      {segmentosCor.map(seg => {
+        const xEsq = reversed ? xMes(seg.fim) : xMes(seg.inicio)
+        const larguraSeg = (seg.fim - seg.inicio + 1) * MES_WIDTH
         return (
           <rect
-            key={`mes-${mesAbs}`}
-            x={xMes(mesAbs)} y={BASE_Y - 8}
-            width={MES_WIDTH} height={16}
-            fill={COR[categoria === 'sem_cobertura' ? 'semCobertura' : categoria]}
+            key={`seg-${seg.inicio}`}
+            x={xEsq} y={BASE_Y - 8}
+            width={larguraSeg} height={16}
+            fill={COR[seg.cat === 'sem_cobertura' ? 'semCobertura' : seg.cat]}
           />
         )
       })}
 
-      {/* Linhas de bloco — fronteiras das janelas de 90 meses, sobre a barra */}
+      {/* Linhas de bloco — fronteiras das janelas de 90 meses */}
       {limitesBloco.map(m => (
         <line
           key={`bloco-${m}`}
@@ -82,13 +95,13 @@ export function EixoLinhaDoTempo({ anoInicio, anoFim, categoriaPorMes, irs, prov
         />
       ))}
 
-      {/* Ticks e labels dos anos — imediatamente abaixo da barra */}
+      {/* Ticks e labels dos anos — logo abaixo da barra */}
       {anos.map(ano => {
         const x = xAno(ano)
         return (
           <g key={`tick-${ano}`}>
             <line x1={x} y1={BASE_Y + 8} x2={x} y2={BASE_Y + 18} stroke={COR.navy} strokeWidth={1} />
-            <text x={x + ANO_WIDTH / 2} y={BASE_Y + 32} textAnchor="middle" fontSize={11} fill={COR.navy} fontFamily="Georgia, serif">
+            <text x={x + ANO_WIDTH / 2} y={BASE_Y + 33} textAnchor="middle" fontSize={11} fill={COR.navy} fontFamily="Georgia, serif">
               {ano}
             </text>
           </g>

@@ -3,6 +3,8 @@ import { EixoLinhaDoTempo, larguraAnos } from './EixoLinhaDoTempo'
 
 const ANOS_POR_FILEIRA = 8
 const COR_SETA = '#0B1F3A'
+// Espaço lateral reservado para as curvas C saírem do bounds do SVG da fileira
+const CURVA_OFFSET = 55
 
 export function ModeloCurvas({ timeline, vinculos, provas, irs, incapacidades }) {
   if (!timeline) return null
@@ -19,14 +21,12 @@ export function ModeloCurvas({ timeline, vinculos, provas, irs, incapacidades })
   }
 
   return (
-    // Fix responsivo: overflow-x auto com padding lateral para acomodar as curvas boustrophedon
-    <div id="area-timeline" style={{ background: 'white', borderRadius: '8px', padding: '12px 50px', overflowX: 'auto' }}>
+    <div id="area-timeline" style={{ background: 'white', borderRadius: '8px', padding: `12px ${CURVA_OFFSET}px` }}>
       <div style={{ marginBottom: '12px', fontFamily: 'Georgia, serif', fontWeight: 'bold', color: '#0B1F3A', fontSize: '14px' }}>
         Linha do Tempo
       </div>
 
       {fileiras.map((fileira, idx) => {
-        // Boustrophedon: fileiras ímpares (1, 3, 5...) com anos decrescentes (maiores à esquerda)
         const reversed = idx % 2 !== 0
         const largura = larguraAnos(fileira.anoInicio, fileira.anoFim)
         const irsFileira = irsNumerados.filter(ir => ir.ano >= fileira.anoInicio && ir.ano <= fileira.anoFim)
@@ -34,7 +34,7 @@ export function ModeloCurvas({ timeline, vinculos, provas, irs, incapacidades })
         const temProximaFileira = idx < fileiras.length - 1
 
         return (
-          <div key={idx} style={{ marginBottom: temProximaFileira ? '0' : '8px' }}>
+          <div key={idx}>
             <EixoLinhaDoTempo
               anoInicio={fileira.anoInicio}
               anoFim={fileira.anoFim}
@@ -45,34 +45,50 @@ export function ModeloCurvas({ timeline, vinculos, provas, irs, incapacidades })
               inicio={inicioAtividade}
               reversed={reversed}
             />
+
             {temProximaFileira && (
-              <svg
-                width={largura}
-                height={60}
-                overflow="visible"
-                style={{ display: 'block', overflow: 'visible' }}
-              >
-                <defs>
-                  <marker id={`seta-curva-${idx}`} markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
-                    <path d="M0,0 L8,4 L0,8 Z" fill={COR_SETA} />
-                  </marker>
-                </defs>
+              // Wrapper com altura fixa reserva o espaço da curva de conexão
+              <div style={{ position: 'relative', height: '60px' }}>
                 {!reversed ? (
-                  // Após fileira par (→): curva em C no lado DIREITO, aponta para início da fileira ímpar (direita)
-                  <path
-                    d={`M ${largura} 4 C ${largura + 40} 4, ${largura + 40} 56, ${largura} 56`}
-                    fill="none" stroke={COR_SETA} strokeWidth={2}
-                    markerEnd={`url(#seta-curva-${idx})`}
-                  />
+                  // Depois de fileira par (→): curva C no lado DIREITO
+                  // SVG é CURVA_OFFSET px mais largo → curva contida, sem overflow
+                  <svg
+                    width={largura + CURVA_OFFSET}
+                    height={60}
+                    style={{ display: 'block' }}
+                  >
+                    <defs>
+                      <marker id={`seta-${idx}`} markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+                        <path d="M8,0 L0,4 L8,8 Z" fill={COR_SETA} />
+                      </marker>
+                    </defs>
+                    <path
+                      d={`M ${largura} 2 C ${largura + CURVA_OFFSET - 10} 2, ${largura + CURVA_OFFSET - 10} 58, ${largura} 58`}
+                      fill="none" stroke={COR_SETA} strokeWidth={2}
+                      markerEnd={`url(#seta-${idx})`}
+                    />
+                  </svg>
                 ) : (
-                  // Após fileira ímpar (←): curva em C no lado ESQUERDO, aponta para início da fileira par (esquerda)
-                  <path
-                    d={`M 0 4 C -40 4, -40 56, 0 56`}
-                    fill="none" stroke={COR_SETA} strokeWidth={2}
-                    markerEnd={`url(#seta-curva-${idx})`}
-                  />
+                  // Depois de fileira ímpar (←): curva C no lado ESQUERDO
+                  // SVG posicionado CURVA_OFFSET px à esquerda, mais largo → curva contida
+                  <svg
+                    width={largura + CURVA_OFFSET}
+                    height={60}
+                    style={{ position: 'absolute', top: 0, left: -CURVA_OFFSET }}
+                  >
+                    <defs>
+                      <marker id={`seta-${idx}`} markerWidth="8" markerHeight="8" refX="2" refY="4" orient="auto">
+                        <path d="M0,0 L8,4 L0,8 Z" fill={COR_SETA} />
+                      </marker>
+                    </defs>
+                    <path
+                      d={`M ${CURVA_OFFSET} 2 C 10 2, 10 58, ${CURVA_OFFSET} 58`}
+                      fill="none" stroke={COR_SETA} strokeWidth={2}
+                      markerEnd={`url(#seta-${idx})`}
+                    />
+                  </svg>
                 )}
-              </svg>
+              </div>
             )}
           </div>
         )
