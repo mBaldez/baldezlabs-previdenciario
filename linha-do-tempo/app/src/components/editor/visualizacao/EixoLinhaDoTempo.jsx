@@ -1,9 +1,9 @@
-import { mesParaAbsoluto } from '../../../lib/calculo'
+import { janelasDerAncoradas, mesParaAbsoluto } from '../../../lib/calculo'
 
 export const ANO_WIDTH = 80
 export const MES_WIDTH = ANO_WIDTH / 12
-export const SVG_HEIGHT = 220
-export const BASE_Y = 120
+export const SVG_HEIGHT = 160
+export const BASE_Y = 110
 export const TICK_H = 20
 
 export const COR = {
@@ -40,9 +40,12 @@ export function EixoLinhaDoTempo({ anoInicio, anoFim, categoriaPorMes, irs, prov
   const mostrarDer = derMesAbs >= mesInicial && derMesAbs <= mesFinal
   const mostrarInicio = inicioMesAbs >= mesInicial && inicioMesAbs <= mesFinal
 
-  // Fix responsivo: sem minWidth forçado — o pai gerencia overflow
-  // Fix grânulos: mês como retângulo com borda branca, tornando cada mês visível individualmente
-  // Fix linhas de bloco: ticks de ano abaixo da barra (não cortando a barra colorida)
+  // Fronteiras das janelas de 90 meses (linhas de bloco)
+  const janelas = (der?.mes && der?.ano && inicio?.mes && inicio?.ano)
+    ? janelasDerAncoradas(der, inicio)
+    : []
+  const limitesBloco = [...new Set(janelas.flatMap(j => [j.inicio, j.fim]))]
+    .filter(m => m >= mesInicial && m <= mesFinal)
 
   const xMes = (mesAbs) =>
     reversed
@@ -56,7 +59,7 @@ export function EixoLinhaDoTempo({ anoInicio, anoFim, categoriaPorMes, irs, prov
 
   return (
     <svg width={totalWidth} height={SVG_HEIGHT} style={{ display: 'block' }}>
-      {/* Barra colorida — grânulo: cada mês separado por borda branca */}
+      {/* Barra colorida por mes */}
       {meses.map(mesAbs => {
         const categoria = categoriaPorMes(mesAbs)
         return (
@@ -65,25 +68,27 @@ export function EixoLinhaDoTempo({ anoInicio, anoFim, categoriaPorMes, irs, prov
             x={xMes(mesAbs)} y={BASE_Y - 8}
             width={MES_WIDTH} height={16}
             fill={COR[categoria === 'sem_cobertura' ? 'semCobertura' : categoria]}
-            stroke="white" strokeWidth={0.5}
           />
         )
       })}
 
-      {/* Linhas de bloco — ticks de ano posicionados abaixo da barra colorida */}
+      {/* Linhas de bloco — fronteiras das janelas de 90 meses, sobre a barra */}
+      {limitesBloco.map(m => (
+        <line
+          key={`bloco-${m}`}
+          x1={xMes(m)} y1={BASE_Y - 8}
+          x2={xMes(m)} y2={BASE_Y + 20}
+          stroke="#5A7A8A" strokeWidth={1.5}
+        />
+      ))}
+
+      {/* Ticks e labels dos anos — imediatamente abaixo da barra */}
       {anos.map(ano => {
         const x = xAno(ano)
         return (
-          <g key={`bloco-${ano}`}>
+          <g key={`tick-${ano}`}>
             <line x1={x} y1={BASE_Y + 8} x2={x} y2={BASE_Y + 18} stroke={COR.navy} strokeWidth={1} />
-            <text
-              x={x + ANO_WIDTH / 2}
-              y={SVG_HEIGHT - 8}
-              textAnchor="middle"
-              fontSize={11}
-              fill={COR.navy}
-              fontFamily="Georgia, serif"
-            >
+            <text x={x + ANO_WIDTH / 2} y={BASE_Y + 32} textAnchor="middle" fontSize={11} fill={COR.navy} fontFamily="Georgia, serif">
               {ano}
             </text>
           </g>
@@ -118,8 +123,8 @@ export function EixoLinhaDoTempo({ anoInicio, anoFim, categoriaPorMes, irs, prov
         const x = xMes(derMesAbs) + MES_WIDTH / 2
         return (
           <g>
-            <line x1={x} y1={BASE_Y - 18} x2={x} y2={BASE_Y + 18} stroke={COR.der} strokeWidth={2} />
-            <text x={x + 4} y={BASE_Y + 32} fontSize={10} fill={COR.der} fontWeight="bold">DER</text>
+            <line x1={x} y1={BASE_Y - 20} x2={x} y2={BASE_Y + 8} stroke={COR.der} strokeWidth={2} />
+            <text x={x + 4} y={BASE_Y - 22} fontSize={10} fill={COR.der} fontWeight="bold">DER</text>
           </g>
         )
       })()}
@@ -129,8 +134,8 @@ export function EixoLinhaDoTempo({ anoInicio, anoFim, categoriaPorMes, irs, prov
         const x = xMes(inicioMesAbs) + MES_WIDTH / 2
         return (
           <g>
-            <line x1={x} y1={BASE_Y - 18} x2={x} y2={BASE_Y + 18} stroke={COR.navy} strokeWidth={2} />
-            <text x={x + 4} y={BASE_Y - 24} fontSize={10} fill={COR.navy} fontWeight="bold">Inicio</text>
+            <line x1={x} y1={BASE_Y - 20} x2={x} y2={BASE_Y + 8} stroke={COR.navy} strokeWidth={2} />
+            <text x={x + 4} y={BASE_Y - 22} fontSize={10} fill={COR.navy} fontWeight="bold">Inicio</text>
           </g>
         )
       })()}
