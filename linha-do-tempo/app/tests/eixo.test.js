@@ -42,7 +42,10 @@ describe('numerarIRs', () => {
 })
 
 describe('prepararDadosEixo', () => {
-  test('converte dados do banco: intervalo total, categoriaPorMes, IRs numerados', () => {
+  test('converte dados do banco: intervalo total, categoriaPorMes (DER-ancorado), IRs numerados, janelas', () => {
+    // der=Jun/2020=24246, inicioAtividade=Jan/2011=24133
+    // Block1=[24156,24246]=[Dec/2012,Jun/2020] — IR Jan/2013=24157 IN -> valida Block1
+    // Block2=[24066,24156] — fim=24066 < inicioAbs=24133 -> stop (2 blocos)
     const timeline = { inicio_mes: 1, inicio_ano: 2011, der_mes: 6, der_ano: 2020 }
     const vinculos = [{ inicio_mes: 1, inicio_ano: 2015, fim_mes: 12, fim_ano: 2015 }]
     const provas = []
@@ -54,7 +57,14 @@ describe('prepararDadosEixo', () => {
     expect(dados.anoInicio).toBe(2011)
     expect(dados.anoFim).toBe(2020)
     expect(dados.irsNumerados).toEqual([{ mes: 1, ano: 2013, numero: 1 }])
+    // Jun/2015 esta dentro do vinculo urbano (prioridade maxima)
     expect(dados.categoriaPorMes(mesParaAbsoluto(MY(6, 2015)))).toBe('vinculo')
-    expect(dados.categoriaPorMes(mesParaAbsoluto(MY(6, 2011)))).toBe('carencia')
+    // Jul/2014=24187 esta no Block1 validado [24156,24246] -> carencia
+    expect(dados.categoriaPorMes(mesParaAbsoluto(MY(7, 2014)))).toBe('carencia')
+    // Jun/2011=24138: Block1 inicia em 24156 > 24138 -> nao esta em carencia -> sem_cobertura
+    expect(dados.categoriaPorMes(mesParaAbsoluto(MY(6, 2011)))).toBe('sem_cobertura')
+    // janelas expostas para visualizacao dos limites de bloco
+    expect(dados.janelas).toHaveLength(2)
+    expect(dados.janelas[0]).toEqual({ inicio: 24156, fim: 24246 })
   })
 })

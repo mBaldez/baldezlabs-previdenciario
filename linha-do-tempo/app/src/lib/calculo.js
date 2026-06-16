@@ -1,10 +1,11 @@
 /**
  * Motor de calculo de carencia previdenciaria rural.
  *
- * Logica baseada no Oficio-Circular 46/DIRBEN/INSS (13/09/2019): cada instrumento
- * ratificador (IR) abre uma janela de 90 meses retroativos a partir da sua data;
- * o periodo rural reconhecido e a uniao das intersecoes entre essas janelas e os
- * periodos rurais autodeclarados. Ver carencia_rural_90_meses_oficio46.md na raiz do repo.
+ * Logica baseada no Oficio-Circular 46/DIRBEN/INSS (13/09/2019): a DER ancora blocos
+ * retroativos de 90 meses (DER-90, DER-180, ...); cada IR que cair dentro de um bloco
+ * valida o bloco inteiro. O periodo rural reconhecido e a uniao das intersecoes entre
+ * os blocos validados e os periodos rurais autodeclarados.
+ * Ver carencia_rural_90_meses_oficio46.md na raiz do repo.
  */
 
 const JANELA_INSTRUMENTO_MESES = 90
@@ -19,10 +20,22 @@ export function duracaoMeses(inicio, fim) {
   return (fim.ano - inicio.ano) * 12 + (fim.mes - inicio.mes)
 }
 
-/** Janela de retroatividade de um IR: 90 meses antes da sua data, ate a sua data */
-function janelaInstrumento(dataIR) {
-  const fim = mesParaAbsoluto(dataIR)
-  return { inicio: fim - JANELA_INSTRUMENTO_MESES, fim }
+/**
+ * Gera blocos de 90 meses ancorados na DER, retroativos ate inicioAtividade.
+ * Retorna [{inicio, fim}] em meses absolutos, do mais recente ao mais antigo.
+ * O ultimo bloco pode comecar antes de inicioAtividade — a intersecao com o
+ * periodo declarado e responsavel por aparar a borda.
+ */
+export function janelasDerAncoradas(der, inicioAtividade) {
+  const derAbs = mesParaAbsoluto(der)
+  const inicioAbs = mesParaAbsoluto(inicioAtividade)
+  const janelas = []
+  let fim = derAbs
+  while (fim > inicioAbs) {
+    janelas.push({ inicio: fim - JANELA_INSTRUMENTO_MESES, fim })
+    fim -= JANELA_INSTRUMENTO_MESES
+  }
+  return janelas
 }
 
 /** Intersecao entre dois intervalos [inicio, fim) em meses absolutos. Retorna null se vazia. */
@@ -134,10 +147,18 @@ export function calcularCarencia({
   let mesesRural = 0
 
   if (instrumentosRatificadores.length > 0) {
-    const segmentos = segmentosRuraisDeclarados(inicioAtividade, der, vinculosUrbanos, provasRetorno)
-    const janelas = instrumentosRatificadores.map(janelaInstrumento)
-    const intersecoes = segmentos.flatMap((seg) => janelas.map((j) => intersecao(seg, j)))
-    mesesRural = totalUniao(intersecoes)
+    const janelas = janelasDerAncoradas(der, inicioAtividade)
+    const janelaValidadas = janelas.filter((j) =>
+      instrumentosRatificadores.some((ir) => {
+        const irAbs = mesParaAbsoluto(ir)
+        return irAbs >= j.inicio && irAbs <= j.fim
+      })
+    )
+    if (janelaValidadas.length > 0) {
+      const segmentos = segmentosRuraisDeclarados(inicioAtividade, der, vinculosUrbanos, provasRetorno)
+      const intersecoes = segmentos.flatMap((seg) => janelaValidadas.map((j) => intersecao(seg, j)))
+      mesesRural = totalUniao(intersecoes)
+    }
   }
 
   const mesesUrbanos = _calcularMesesUrbanos(vinculosUrbanos)
@@ -150,18 +171,25 @@ export function calcularCarencia({
 }
 
 /**
- * Segmentos de carencia rural reconhecidos: uniao das intersecoes entre os
- * periodos rurais autodeclarados e as janelas de 90 meses de cada instrumento
- * ratificador. Mesma logica de calcularCarencia, mas devolve os segmentos
- * {inicio, fim} (meses absolutos) em vez de so o total — usado pela
- * visualizacao (Fase 3) para desenhar a faixa de carencia com "buracos".
+ * Segmentos de carencia rural reconhecidos: blocos de 90 meses ancorados na DER
+ * que contenham pelo menos um IR, intersectados com os periodos rurais declarados.
+ * Devolve [{inicio, fim}] em meses absolutos — usado pela visualizacao para desenhar
+ * a faixa de carencia com "buracos" (blocos sem IR aparecem em cinza).
  */
 export function segmentosCarencia({ inicioAtividade, der, vinculosUrbanos, provasRetorno, instrumentosRatificadores }) {
   if (instrumentosRatificadores.length === 0) return []
 
+  const janelas = janelasDerAncoradas(der, inicioAtividade)
+  const janelaValidadas = janelas.filter((j) =>
+    instrumentosRatificadores.some((ir) => {
+      const irAbs = mesParaAbsoluto(ir)
+      return irAbs >= j.inicio && irAbs <= j.fim
+    })
+  )
+  if (janelaValidadas.length === 0) return []
+
   const segmentos = segmentosRuraisDeclarados(inicioAtividade, der, vinculosUrbanos, provasRetorno)
-  const janelas = instrumentosRatificadores.map(janelaInstrumento)
-  const intersecoes = segmentos.flatMap((seg) => janelas.map((j) => intersecao(seg, j)))
+  const intersecoes = segmentos.flatMap((seg) => janelaValidadas.map((j) => intersecao(seg, j)))
   return uniaoIntervalos(intersecoes)
 }
 

@@ -1,4 +1,4 @@
-import { mesParaAbsoluto, segmentosCarencia } from './calculo'
+import { janelasDerAncoradas, mesParaAbsoluto, segmentosCarencia } from './calculo'
 
 /**
  * Categoria visual de um mes absoluto, com prioridade:
@@ -64,5 +64,6 @@ export function prepararDadosEixo({ timeline, vinculos, provas, irs, incapacidad
     provasConvertidas,
     der,
     inicioAtividade,
+    janelas: janelasDerAncoradas(der, inicioAtividade),
   }
 }
