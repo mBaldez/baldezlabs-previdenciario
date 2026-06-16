@@ -21,6 +21,8 @@ export function EditorPage() {
   const [salvando, setSalvando] = useState(false)
   const [viewAtiva, setViewAtiva] = useState('timeline')
   const [modeloVisual, setModeloVisual] = useState('horizontal')
+  // Snapshot frozen on "Gerar Linha do Tempo" — timeline only re-renders on explicit button press
+  const [snapshotGerado, setSnapshotGerado] = useState(null)
 
   // Estado das tabelas filhas
   const [vinculos, setVinculos] = useState([])
@@ -136,6 +138,17 @@ export function EditorPage() {
     </div>
   )
 
+  function handleGerar() {
+    setSnapshotGerado({
+      timeline: { ...timeline },
+      vinculos: [...vinculos],
+      provas: [...provas],
+      irs: [...irs],
+      incapacidades: [...incapacidades],
+    })
+    setViewAtiva('timeline')
+  }
+
   // Secoes do sidebar
   const secoes = [
     {
@@ -143,7 +156,7 @@ export function EditorPage() {
       conteudo: <SecaoAtividadeRural
         timeline={timeline}
         onAtualizar={async (campos) => { setSalvando(true); await atualizar(campos); setSalvando(false) }}
-        onGerar={() => setViewAtiva('timeline')}
+        onGerar={handleGerar}
       />
     },
     {
@@ -193,15 +206,20 @@ export function EditorPage() {
             padding: '20px', minHeight: '400px',
             boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
           }}>
-            {viewAtiva === 'timeline' && (
+            {viewAtiva === 'timeline' && snapshotGerado && (
               <ViewLinhaDoTempo
-                timeline={timeline}
-                vinculos={vinculos}
-                provas={provas}
-                irs={irs}
-                incapacidades={incapacidades}
+                timeline={snapshotGerado.timeline}
+                vinculos={snapshotGerado.vinculos}
+                provas={snapshotGerado.provas}
+                irs={snapshotGerado.irs}
+                incapacidades={snapshotGerado.incapacidades}
                 modeloVisual={modeloVisual}
               />
+            )}
+            {viewAtiva === 'timeline' && !snapshotGerado && (
+              <p style={{ color: '#999', textAlign: 'center', padding: '60px 20px', fontFamily: 'Georgia, serif', fontSize: '15px' }}>
+                Configure a DER e o Início da Atividade Rural, depois pressione "Gerar Linha do Tempo".
+              </p>
             )}
             {viewAtiva === 'irs' && (
               <ViewDescreverIRs

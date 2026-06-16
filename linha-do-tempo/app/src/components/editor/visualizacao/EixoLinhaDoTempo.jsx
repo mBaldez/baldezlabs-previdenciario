@@ -26,12 +26,16 @@ export function larguraAnos(anoInicio, anoFim) {
   return (anoFim - anoInicio + 1) * ANO_WIDTH
 }
 
-export function EixoLinhaDoTempo({ anoInicio, anoFim, categoriaPorMes, irs, provas, der, inicio, reversed = false }) {
+// Renders row content as <g> — used by ModeloCurvas inside a single SVG
+export function EixoContent({
+  anoInicio, anoFim, categoriaPorMes, irs, provas, der, inicio,
+  reversed = false, mesInicioOverride, mesFimOverride,
+}) {
   const totalWidth = larguraAnos(anoInicio, anoFim)
   const anos = Array.from({ length: anoFim - anoInicio + 1 }, (_, i) => anoInicio + i)
 
-  const mesInicial = anoInicio * 12 + 1
-  const mesFinal = anoFim * 12 + 12
+  const mesInicial = mesInicioOverride ?? (anoInicio * 12 + 1)
+  const mesFinal = mesFimOverride ?? (anoFim * 12 + 12)
   const meses = []
   for (let m = mesInicial; m <= mesFinal; m++) meses.push(m)
 
@@ -40,7 +44,6 @@ export function EixoLinhaDoTempo({ anoInicio, anoFim, categoriaPorMes, irs, prov
   const mostrarDer = derMesAbs >= mesInicial && derMesAbs <= mesFinal
   const mostrarInicio = inicioMesAbs >= mesInicial && inicioMesAbs <= mesFinal
 
-  // Fronteiras das janelas de 90 meses
   const janelas = (der?.mes && der?.ano && inicio?.mes && inicio?.ano)
     ? janelasDerAncoradas(der, inicio)
     : []
@@ -57,7 +60,6 @@ export function EixoLinhaDoTempo({ anoInicio, anoFim, categoriaPorMes, irs, prov
       ? (anoFim - ano) * ANO_WIDTH
       : (ano - anoInicio) * ANO_WIDTH
 
-  // Agrupa meses consecutivos de mesma cor em segmentos contínuos (sem quadrados)
   const segmentosCor = []
   for (const m of meses) {
     const cat = categoriaPorMes(m)
@@ -70,8 +72,8 @@ export function EixoLinhaDoTempo({ anoInicio, anoFim, categoriaPorMes, irs, prov
   }
 
   return (
-    <svg width={totalWidth} height={SVG_HEIGHT} style={{ display: 'block' }}>
-      {/* Barra contínua por categoria (sem quadrados de meses) */}
+    <g>
+      {/* Continuous color bar */}
       {segmentosCor.map(seg => {
         const xEsq = reversed ? xMes(seg.fim) : xMes(seg.inicio)
         const larguraSeg = (seg.fim - seg.inicio + 1) * MES_WIDTH
@@ -85,7 +87,19 @@ export function EixoLinhaDoTempo({ anoInicio, anoFim, categoriaPorMes, irs, prov
         )
       })}
 
-      {/* Linhas de bloco — fronteiras das janelas de 90 meses */}
+      {/* Subtle year-boundary dividers within bar */}
+      {anos.map(ano => {
+        const x = xAno(ano)
+        if (x <= 0 || x >= totalWidth) return null
+        return (
+          <line key={`ydiv-${ano}`}
+            x1={x} y1={BASE_Y - 8} x2={x} y2={BASE_Y + 8}
+            stroke="rgba(255,255,255,0.5)" strokeWidth={1}
+          />
+        )
+      })}
+
+      {/* 90-month block boundary lines */}
       {limitesBloco.map(m => (
         <line
           key={`bloco-${m}`}
@@ -95,7 +109,7 @@ export function EixoLinhaDoTempo({ anoInicio, anoFim, categoriaPorMes, irs, prov
         />
       ))}
 
-      {/* Ticks e labels dos anos — logo abaixo da barra */}
+      {/* Year ticks and centered labels */}
       {anos.map(ano => {
         const x = xAno(ano)
         return (
@@ -109,7 +123,7 @@ export function EixoLinhaDoTempo({ anoInicio, anoFim, categoriaPorMes, irs, prov
       })}
       <line x1={totalWidth} y1={BASE_Y + 8} x2={totalWidth} y2={BASE_Y + 18} stroke={COR.navy} strokeWidth={1} />
 
-      {/* IRs numerados */}
+      {/* Numbered IRs */}
       {irs.map(ir => {
         const x = xMes(mesParaAbsoluto(ir)) + MES_WIDTH / 2
         return (
@@ -131,7 +145,7 @@ export function EixoLinhaDoTempo({ anoInicio, anoFim, categoriaPorMes, irs, prov
         )
       })}
 
-      {/* DER */}
+      {/* DER marker */}
       {mostrarDer && (() => {
         const x = xMes(derMesAbs) + MES_WIDTH / 2
         return (
@@ -142,7 +156,7 @@ export function EixoLinhaDoTempo({ anoInicio, anoFim, categoriaPorMes, irs, prov
         )
       })()}
 
-      {/* Inicio da Atividade Rural */}
+      {/* Início da Atividade Rural marker */}
       {mostrarInicio && (() => {
         const x = xMes(inicioMesAbs) + MES_WIDTH / 2
         return (
@@ -152,6 +166,16 @@ export function EixoLinhaDoTempo({ anoInicio, anoFim, categoriaPorMes, irs, prov
           </g>
         )
       })()}
+    </g>
+  )
+}
+
+// Standalone SVG wrapper — keeps backward compat with ModeloHorizontal
+export function EixoLinhaDoTempo(props) {
+  const totalWidth = larguraAnos(props.anoInicio, props.anoFim)
+  return (
+    <svg width={totalWidth} height={SVG_HEIGHT} style={{ display: 'block' }}>
+      <EixoContent {...props} />
     </svg>
   )
 }
