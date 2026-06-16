@@ -26,13 +26,7 @@ export function larguraAnos(anoInicio, anoFim) {
   return (anoFim - anoInicio + 1) * ANO_WIDTH
 }
 
-/**
- * Renderiza uma fileira do eixo da linha do tempo: anos/ticks, barra colorida
- * por categoria de mes, IRs numerados, Provas de Retorno, DER e Inicio.
- * Props ja "prontas" (ver lib/eixo.js prepararDadosEixo): categoriaPorMes e
- * irs sao calculados uma vez pelo wrapper e compartilhados entre fileiras.
- */
-export function EixoLinhaDoTempo({ anoInicio, anoFim, categoriaPorMes, irs, provas, der, inicio }) {
+export function EixoLinhaDoTempo({ anoInicio, anoFim, categoriaPorMes, irs, provas, der, inicio, reversed = false }) {
   const totalWidth = larguraAnos(anoInicio, anoFim)
   const anos = Array.from({ length: anoFim - anoInicio + 1 }, (_, i) => anoInicio + i)
 
@@ -46,38 +40,60 @@ export function EixoLinhaDoTempo({ anoInicio, anoFim, categoriaPorMes, irs, prov
   const mostrarDer = derMesAbs >= mesInicial && derMesAbs <= mesFinal
   const mostrarInicio = inicioMesAbs >= mesInicial && inicioMesAbs <= mesFinal
 
+  // Fix responsivo: sem minWidth forçado — o pai gerencia overflow
+  // Fix grânulos: mês como retângulo com borda branca, tornando cada mês visível individualmente
+  // Fix linhas de bloco: ticks de ano abaixo da barra (não cortando a barra colorida)
+
+  const xMes = (mesAbs) =>
+    reversed
+      ? totalWidth - MES_WIDTH * (mesAbs - anoInicio * 12)
+      : xParaMes(mesAbs, anoInicio)
+
+  const xAno = (ano) =>
+    reversed
+      ? (anoFim - ano) * ANO_WIDTH
+      : (ano - anoInicio) * ANO_WIDTH
+
   return (
-    <svg width={totalWidth} height={SVG_HEIGHT} style={{ display: 'block', minWidth: '100%' }}>
-      {/* Barra colorida por mes, sobre o eixo */}
+    <svg width={totalWidth} height={SVG_HEIGHT} style={{ display: 'block' }}>
+      {/* Barra colorida — grânulo: cada mês separado por borda branca */}
       {meses.map(mesAbs => {
         const categoria = categoriaPorMes(mesAbs)
         return (
           <rect
             key={`mes-${mesAbs}`}
-            x={xParaMes(mesAbs, anoInicio)} y={BASE_Y - 8}
+            x={xMes(mesAbs)} y={BASE_Y - 8}
             width={MES_WIDTH} height={16}
             fill={COR[categoria === 'sem_cobertura' ? 'semCobertura' : categoria]}
+            stroke="white" strokeWidth={0.5}
           />
         )
       })}
 
-      {/* Ticks e labels dos anos */}
+      {/* Linhas de bloco — ticks de ano posicionados abaixo da barra colorida */}
       {anos.map(ano => {
-        const x = (ano - anoInicio) * ANO_WIDTH
+        const x = xAno(ano)
         return (
-          <g key={`tick-${ano}`}>
-            <line x1={x} y1={BASE_Y - TICK_H} x2={x} y2={BASE_Y + TICK_H} stroke={COR.navy} strokeWidth={1} />
-            <text x={x + ANO_WIDTH / 2} y={SVG_HEIGHT - 8} textAnchor="middle" fontSize={11} fill={COR.navy} fontFamily="Georgia, serif">
+          <g key={`bloco-${ano}`}>
+            <line x1={x} y1={BASE_Y + 8} x2={x} y2={BASE_Y + 18} stroke={COR.navy} strokeWidth={1} />
+            <text
+              x={x + ANO_WIDTH / 2}
+              y={SVG_HEIGHT - 8}
+              textAnchor="middle"
+              fontSize={11}
+              fill={COR.navy}
+              fontFamily="Georgia, serif"
+            >
               {ano}
             </text>
           </g>
         )
       })}
-      <line x1={totalWidth} y1={BASE_Y - TICK_H} x2={totalWidth} y2={BASE_Y + TICK_H} stroke={COR.navy} strokeWidth={1} />
+      <line x1={totalWidth} y1={BASE_Y + 8} x2={totalWidth} y2={BASE_Y + 18} stroke={COR.navy} strokeWidth={1} />
 
       {/* IRs numerados */}
       {irs.map(ir => {
-        const x = xParaMes(mesParaAbsoluto(ir), anoInicio) + MES_WIDTH / 2
+        const x = xMes(mesParaAbsoluto(ir)) + MES_WIDTH / 2
         return (
           <g key={`ir-${ir.numero}`}>
             <line x1={x} y1={BASE_Y - 26} x2={x} y2={BASE_Y + 12} stroke={COR.ir} strokeWidth={2} />
@@ -91,7 +107,7 @@ export function EixoLinhaDoTempo({ anoInicio, anoFim, categoriaPorMes, irs, prov
 
       {/* Provas de Retorno */}
       {provas.map((pr, i) => {
-        const x = xParaMes(mesParaAbsoluto(pr), anoInicio) + MES_WIDTH / 2
+        const x = xMes(mesParaAbsoluto(pr)) + MES_WIDTH / 2
         return (
           <circle key={`pr-${i}`} cx={x} cy={BASE_Y} r={5} fill={COR.provaRetorno} stroke="white" strokeWidth={1.5} />
         )
@@ -99,7 +115,7 @@ export function EixoLinhaDoTempo({ anoInicio, anoFim, categoriaPorMes, irs, prov
 
       {/* DER */}
       {mostrarDer && (() => {
-        const x = xParaMes(derMesAbs, anoInicio) + MES_WIDTH / 2
+        const x = xMes(derMesAbs) + MES_WIDTH / 2
         return (
           <g>
             <line x1={x} y1={BASE_Y - 18} x2={x} y2={BASE_Y + 18} stroke={COR.der} strokeWidth={2} />
@@ -110,7 +126,7 @@ export function EixoLinhaDoTempo({ anoInicio, anoFim, categoriaPorMes, irs, prov
 
       {/* Inicio da Atividade Rural */}
       {mostrarInicio && (() => {
-        const x = xParaMes(inicioMesAbs, anoInicio) + MES_WIDTH / 2
+        const x = xMes(inicioMesAbs) + MES_WIDTH / 2
         return (
           <g>
             <line x1={x} y1={BASE_Y - 18} x2={x} y2={BASE_Y + 18} stroke={COR.navy} strokeWidth={2} />
